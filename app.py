@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 import uuid
 from pathlib import Path
 from urllib.parse import urlparse
@@ -20,8 +21,26 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("mashuk")
 
+
+def normalize_database_url(raw: str) -> str:
+    s = (raw or "").strip().strip("'\"")
+    if not s:
+        return ""
+    found = re.search(r"(postgres(?:ql)?://\S+)", s, re.I)
+    if found:
+        return found.group(1).rstrip("\"';")
+    if s.lower().startswith("psql"):
+        rest = s[4:].strip().strip("'\"")
+        if rest:
+            return normalize_database_url(rest)
+        return ""
+    return s
+
+
 ROOT = Path(__file__).resolve().parent
-DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
+DATABASE_URL = normalize_database_url(os.environ.get("DATABASE_URL", ""))
+if DATABASE_URL:
+    os.environ["DATABASE_URL"] = DATABASE_URL
 UPLOAD_DIR = Path(os.environ.get("UPLOAD_DIR", str(ROOT / "uploads"))).resolve()
 MAX_FILE_MB = int(os.environ.get("MAX_FILE_MB", "20"))
 MAX_BYTES = MAX_FILE_MB * 1024 * 1024
