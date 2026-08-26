@@ -48,6 +48,7 @@
     bars.forEach(function(b,i){ b.classList.toggle("is-on", i < n); });
     root.scrollIntoView({behavior:"smooth", block:"start"});
     setTimeout(notifyHeight, 50);
+    saveDraft();
   }
   function need(name){
     if (!val(name)) { showErr(name, T.req); return false; }
@@ -80,10 +81,121 @@
         if (!ok){ alert(T.err_pdf); input.value=""; return; }
       }
       if (nameEl) nameEl.textContent = f.name + " | " + T.file_ok;
+      saveDraft();
+      saveFiles();
     });
   }
   bindFile("portfolio", true);
   bindFile("consent_file", false);
+
+  var DRAFT_KEY = "mshk-apply-draft-v1";
+  var saveTimer = null;
+  function collectDraft(){
+    var o = {step: step, values: {}, checks: {}};
+    $$("input, textarea, select").forEach(function(el){
+      if (!el.name) return;
+      if (el.type === "file") return;
+      if (el.type === "checkbox") {
+        if (!o.checks[el.name]) o.checks[el.name] = [];
+        if (el.checked) o.checks[el.name].push(el.value);
+        return;
+      }
+      if (el.type === "radio") {
+        if (el.checked) o.values[el.name] = el.value;
+        return;
+      }
+      o.values[el.name] = el.value;
+    });
+    return o;
+  }
+  function saveDraft(){
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(collectDraft())); } catch (e) {}
+  }
+  function scheduleSave(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){ saveDraft(); }, 250);
+  }
+  function putFile(input, file){
+    if (!input || !file) return;
+    try {
+      var dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+      var nameEl = $("#"+input.id+"-name");
+      if (nameEl) nameEl.textContent = file.name + " | " + T.file_ok;
+    } catch (e) {}
+  }
+  function idbOpen(){
+    return new Promise(function(res, rej){
+      if (!window.indexedDB) { res(null); return; }
+      var r = indexedDB.open("mshk-apply", 1);
+      r.onupgradeneeded = function(){ r.result.createObjectStore("files"); };
+      r.onsuccess = function(){ res(r.result); };
+      r.onerror = function(){ res(null); };
+    });
+  }
+  function saveFiles(){
+    idbOpen().then(function(db){
+      if (!db) return;
+      var st = db.transaction("files", "readwrite").objectStore("files");
+      var pf = $("#portfolio"); var cf = $("#consent_file");
+      st.put(pf && pf.files[0] ? pf.files[0] : null, "portfolio");
+      st.put(cf && cf.files[0] ? cf.files[0] : null, "consent_file");
+    });
+  }
+  function loadFiles(){
+    return idbOpen().then(function(db){
+      if (!db) return {};
+      return new Promise(function(res){
+        var st = db.transaction("files", "readonly").objectStore("files");
+        var out = {}, n = 0;
+        ["portfolio","consent_file"].forEach(function(k){
+          var g = st.get(k);
+          g.onsuccess = function(){ out[k] = g.result; n++; if (n===2) res(out); };
+          g.onerror = function(){ n++; if (n===2) res(out); };
+        });
+      });
+    });
+  }
+  function clearDraft(){
+    try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+    idbOpen().then(function(db){
+      if (!db) return;
+      db.transaction("files", "readwrite").objectStore("files").clear();
+    });
+  }
+  function restoreDraft(){
+    var raw = null;
+    try { raw = localStorage.getItem(DRAFT_KEY); } catch (e) {}
+    if (!raw) return 1;
+    var o;
+    try { o = JSON.parse(raw); } catch (e) { return 1; }
+    Object.keys(o.values || {}).forEach(function(name){
+      var v = o.values[name];
+      if (v === undefined || v === null) return;
+      var radios = $$('input[type="radio"][name="'+name+'"]');
+      if (radios.length) {
+        radios.forEach(function(x){ x.checked = x.value === v; });
+        return;
+      }
+      var el = root.querySelector('[name="'+name+'"]');
+      if (el && el.type !== "checkbox" && el.type !== "file") el.value = v;
+    });
+    Object.keys(o.checks || {}).forEach(function(name){
+      var set = o.checks[name] || [];
+      $$('input[name="'+name+'"]').forEach(function(el){
+        if (el.type === "checkbox") el.checked = set.indexOf(el.value) >= 0;
+      });
+    });
+    countArea("why"); countArea("coop");
+    var yes = "\u0414\u0430";
+    var box = $('[data-field="intl_details"]');
+    if (box) box.style.display = val("intl_programs")===yes ? "" : "none";
+    box = $('[data-field="ru_details"]');
+    if (box) box.style.display = val("ru_programs")===yes ? "" : "none";
+    var n = parseInt(o.step, 10);
+    return (n >= 1 && n <= 4) ? n : 1;
+  }
 
   function validStep(n){
     var ok = true;
@@ -114,7 +226,6 @@
       else showErr("portfolio","");
     }
     if (n===4){
-      ["address","passport_series","passport_number","passport_date","passport_issued"].forEach(req);
       var cf = $("#consent_file");
       if (!cf || !cf.files || !cf.files[0]) { showErr("consent_file", T.err_sign); ok=false; }
       else showErr("consent_file","");
@@ -154,11 +265,14 @@
   }
   function downloadDoc(){
     var fio = val("fio_ru") && val("fio_ru") !== "\u043d\u0435\u0442" ? val("fio_ru") : val("fio_latin");
-    var addr = val("address"), ser = val("passport_series"), num = val("passport_number");
-    var pdt = val("passport_date"), pby = val("passport_issued"), phone = val("phone");
-    if (!fio || !addr || !ser || !num || !pdt || !pby || !phone){ alert(T.need_fio); return; }
+    var addr = val("address") || "____________________";
+    var ser = val("passport_series") || "______";
+    var num = val("passport_number") || "__________";
+    var pdt = val("passport_date") || "__________";
+    var pby = val("passport_issued") || "____________________";
+    var phone = val("phone") || "____________________";
     var pass = ser + " " + num + ", " + pdt + ", " + pby;
-    var header = "\u042f, " + fio + ", \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439(-\u0430\u044f) \u043f\u043e \u0430\u0434\u0440\u0435\u0441\u0443: " + addr + ", \u043e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442, \u0443\u0434\u043e\u0441\u0442\u043e\u0432\u0435\u0440\u044f\u044e\u0449\u0438\u0439 \u043b\u0438\u0447\u043d\u043e\u0441\u0442\u044c (\u043f\u0430\u0441\u043f\u043e\u0440\u0442) " + pass + ", \u043d\u043e\u043c\u0435\u0440 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430: " + phone;
+    var header = "\u042f, " + (fio || "____________________") + ", \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439(-\u0430\u044f) \u043f\u043e \u0430\u0434\u0440\u0435\u0441\u0443: " + addr + ", \u043e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442, \u0443\u0434\u043e\u0441\u0442\u043e\u0432\u0435\u0440\u044f\u044e\u0449\u0438\u0439 \u043b\u0438\u0447\u043d\u043e\u0441\u0442\u044c (\u043f\u0430\u0441\u043f\u043e\u0440\u0442) " + pass + ", \u043d\u043e\u043c\u0435\u0440 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430: " + phone;
     var paras = BODY.split(/\n+/).filter(Boolean).map(function(p){
       return "<p style='margin:0 0 10pt;font-size:12pt;line-height:1.35;text-align:justify;font-family:Times New Roman,serif'>"+esc(p)+"</p>";
     }).join("");
@@ -216,14 +330,27 @@
     }
     fetch(ENDPOINT, {method:"POST", body: fd}).then(function(r){
       if (!r.ok) throw new Error("bad");
+      clearDraft();
       done(true, T.ok_sent);
     }).catch(function(){
       if (btn) btn.disabled = false;
       alert(T.err_send);
     });
   }
-  go(1);
-  notifyHeight();
+  root.addEventListener("input", scheduleSave);
+  root.addEventListener("change", function(){ saveDraft(); saveFiles(); });
+  var startStep = restoreDraft();
+  loadFiles().then(function(files){
+    if (files) {
+      putFile($("#portfolio"), files.portfolio);
+      putFile($("#consent_file"), files.consent_file);
+    }
+    go(startStep);
+    notifyHeight();
+  }).catch(function(){
+    go(startStep);
+    notifyHeight();
+  });
   window.addEventListener("resize", notifyHeight);
 })();
 </script>

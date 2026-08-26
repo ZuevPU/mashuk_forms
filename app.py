@@ -11,7 +11,7 @@ from psycopg.types.json import Json
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from admin_api import router as admin_router
@@ -188,6 +188,39 @@ def admin_page():
 
 
 app.include_router(admin_router, prefix="/admin")
+
+
+@app.get("/consent-template")
+def consent_template():
+    src_docx = ROOT / "consent" / "consent-source.docx"
+    if src_docx.exists():
+        return FileResponse(
+            src_docx,
+            filename="Soglasie_shablon.docx",
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        )
+    txt = ROOT / "consent" / "consent-text.txt"
+    body = txt.read_text(encoding="utf-8") if txt.exists() else ""
+    paras = []
+    for line in body.splitlines():
+        safe = (
+            line.replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+        )
+        paras.append("<p>" + (safe or "&nbsp;") + "</p>")
+    html = (
+        "<html xmlns:o='urn:schemas-microsoft-com:office:office' "
+        "xmlns:w='urn:schemas-microsoft-com:office:word'>"
+        "<head><meta charset='utf-8'></head><body>"
+        + "".join(paras)
+        + "</body></html>"
+    )
+    return Response(
+        content=("\ufeff" + html).encode("utf-8"),
+        media_type="application/msword",
+        headers={"Content-Disposition": 'attachment; filename="Soglasie_shablon.doc"'},
+    )
 
 
 @app.post("/apply")
