@@ -1,0 +1,18 @@
+<!-- Tilda T123, padding 0, full width.
+     After Timeweb deploy replace src with https://apply.YOUR-DOMAIN/ -->
+<iframe
+  id="mshk-apply-frame"
+  src="http://127.0.0.1:8000/"
+  title="Mashuk apply"
+  loading="lazy"
+  style="display:block;width:100%;border:0;min-height:1100px;background:#fafafa;">
+</iframe>
+<script>
+window.addEventListener("message", function (e) {
+  if (!e.data || e.data.type !== "mshk-apply-height") return;
+  var frame = document.getElementById("mshk-apply-frame");
+  if (!frame) return;
+  var h = Number(e.data.height);
+  if (h > 400 && h < 20000) frame.style.height = h + "px";
+});
+</script>

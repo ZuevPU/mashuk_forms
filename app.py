@@ -1,0 +1,251 @@
+import json
+import logging
+import os
+import uuid
+from pathlib import Path
+
+import psycopg
+from psycopg.types.json import Json
+from dotenv import load_dotenv
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+
+from admin_api import router as admin_router
+
+load_dotenv()
+
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger("mashuk")
+
+ROOT = Path(__file__).resolve().parent
+DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
+UPLOAD_DIR = Path(os.environ.get("UPLOAD_DIR", str(ROOT / "uploads"))).resolve()
+MAX_FILE_MB = int(os.environ.get("MAX_FILE_MB", "20"))
+MAX_BYTES = MAX_FILE_MB * 1024 * 1024
+FRAME_ANCESTORS = os.environ.get(
+    "FRAME_ANCESTORS",
+    "http://127.0.0.1:8000 http://localhost:8000 https://*.tilda.ws https://*.tilda.cc",
+)
+CORS_ORIGINS = [
+    o.strip()
+    for o in os.environ.get(
+        "CORS_ORIGINS",
+        "http://127.0.0.1:8000,http://localhost:8000",
+    ).split(",")
+    if o.strip()
+]
+
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+
+class FrameAncestorsMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        if request.url.path.startswith("/admin"):
+            response.headers["Content-Security-Policy"] = "frame-ancestors 'self'"
+        else:
+            response.headers["Content-Security-Policy"] = (
+                "frame-ancestors 'self' " + FRAME_ANCESTORS
+            )
+        if "x-frame-options" in response.headers:
+            del response.headers["x-frame-options"]
+        return response
+
+
+app = FastAPI(title="Mashuk seminar applications", docs_url=None, redoc_url=None)
+app.add_middleware(FrameAncestorsMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["POST", "OPTIONS", "GET"],
+    allow_headers=["*"],
+    max_age=86400,
+)
+
+
+def init_schema() -> None:
+    if not DATABASE_URL:
+        log.warning("DATABASE_URL is empty")
+        return
+    schema = (ROOT / "schema.sql").read_text(encoding="utf-8")
+    statements = [s.strip() for s in schema.split(";") if s.strip()]
+    with psycopg.connect(DATABASE_URL) as conn:
+        with conn.cursor() as cur:
+            for stmt in statements:
+                cur.execute(stmt)
+        conn.commit()
+    log.info("schema ready")
+
+
+@app.on_event("startup")
+def on_startup():
+    try:
+        init_schema()
+    except Exception:
+        log.exception("schema init failed")
+
+
+def save_upload(kind: str, upload: UploadFile, allowed: set[str]) -> str:
+    if not upload or not upload.filename:
+        raise HTTPException(400, f"missing file: {kind}")
+    suffix = Path(upload.filename).suffix.lower()
+    if suffix not in allowed:
+        raise HTTPException(400, f"bad file type for {kind}")
+    data = upload.file.read()
+    if not data:
+        raise HTTPException(400, f"empty file: {kind}")
+    if len(data) > MAX_BYTES:
+        raise HTTPException(400, f"file too large: {kind}")
+    name = f"{uuid.uuid4().hex}_{kind}{suffix}"
+    path = UPLOAD_DIR / name
+    path.write_bytes(data)
+    return str(path)
+
+
+@app.get("/health")
+def health():
+    db_ok = False
+    db_error = None
+    if DATABASE_URL:
+        try:
+            with psycopg.connect(DATABASE_URL, connect_timeout=5) as conn:
+                conn.execute("SELECT 1")
+            db_ok = True
+        except Exception as exc:
+            db_error = str(exc)
+    return {"ok": True, "db": db_ok, "db_error": db_error}
+
+
+@app.get("/")
+def index():
+    path = ROOT / "static" / "index.html"
+    if not path.exists():
+        path = ROOT / "tilda" / "preview-apply.html"
+    if not path.exists():
+        raise HTTPException(404, "frontend is missing")
+    return FileResponse(path, media_type="text/html; charset=utf-8")
+
+
+@app.get("/admin")
+@app.get("/admin/")
+def admin_page():
+    path = ROOT / "static" / "admin.html"
+    if not path.exists():
+        raise HTTPException(404, "admin frontend is missing")
+    return FileResponse(
+        path,
+        media_type="text/html; charset=utf-8",
+        headers={"Cache-Control": "no-store"},
+    )
+
+
+app.include_router(admin_router, prefix="/admin")
+
+
+@app.post("/apply")
+def apply(
+    payload: str = Form(...),
+    portfolio: UploadFile = File(...),
+    consent: UploadFile = File(...),
+):
+    if not DATABASE_URL:
+        raise HTTPException(500, "DATABASE_URL is not set")
+    try:
+        data = json.loads(payload)
+    except json.JSONDecodeError:
+        raise HTTPException(400, "payload must be JSON")
+    if not isinstance(data, dict):
+        raise HTTPException(400, "payload must be an object")
+    if not str(data.get("email") or "").strip():
+        raise HTTPException(400, "email required")
+    if not str(data.get("fio_latin") or "").strip():
+        raise HTTPException(400, "fio_latin required")
+
+    portfolio_path = save_upload("portfolio", portfolio, {".pdf"})
+    consent_path = save_upload(
+        "consent",
+        consent,
+        {".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx"},
+    )
+
+    cols = [
+        "program",
+        "fio_latin",
+        "fio_ru",
+        "birth_date",
+        "gender",
+        "country",
+        "city",
+        "arrival",
+        "citizenship",
+        "all_citizenships",
+        "phone",
+        "email",
+        "messenger",
+        "messenger_link",
+        "messenger_other",
+        "org_name",
+        "org_spec",
+        "org_location",
+        "position",
+        "audience",
+        "audience_other",
+        "stream",
+        "how_learned",
+        "intl_programs",
+        "intl_details",
+        "ru_programs",
+        "ru_details",
+        "why",
+        "coop",
+        "mentor",
+        "directions",
+        "directions_other",
+        "address",
+        "passport_series",
+        "passport_number",
+        "passport_date",
+        "passport_issued",
+        "portfolio_path",
+        "consent_path",
+        "payload_raw",
+    ]
+    values = []
+    for col in cols:
+        if col == "portfolio_path":
+            values.append(portfolio_path)
+        elif col == "consent_path":
+            values.append(consent_path)
+        elif col == "payload_raw":
+            values.append(Json(data))
+        elif col in ("messenger", "audience", "directions"):
+            values.append(Json(data.get(col) or []))
+        else:
+            val = data.get(col)
+            if isinstance(val, (list, dict)):
+                values.append(json.dumps(val, ensure_ascii=False))
+            else:
+                values.append(None if val is None else str(val))
+
+    placeholders = ", ".join(["%s"] * len(cols))
+    sql = (
+        "INSERT INTO seminar_applications ("
+        + ", ".join(cols)
+        + ") VALUES ("
+        + placeholders
+        + ") RETURNING id"
+    )
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, values)
+                row = cur.fetchone()
+            conn.commit()
+    except Exception:
+        log.exception("insert failed")
+        raise HTTPException(500, "database error")
+
+    return JSONResponse({"ok": True, "id": row[0] if row else None})

@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: mashuk
+      POSTGRES_PASSWORD: mashuk
+      POSTGRES_DB: mashuk
+    ports:
+      - "5433:5432"
+    volumes:
+      - mashuk_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mashuk -d mashuk"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mashuk_pg:
