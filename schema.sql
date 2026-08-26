@@ -47,3 +47,43 @@ CREATE INDEX IF NOT EXISTS seminar_applications_email_idx
     ON seminar_applications (email);
 CREATE INDEX IF NOT EXISTS seminar_applications_created_idx
     ON seminar_applications (created_at DESC);
+
+CREATE TABLE IF NOT EXISTS participant_details (
+    id                   BIGSERIAL PRIMARY KEY,
+    created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    fio_latin            TEXT NOT NULL,
+    health_limits        TEXT,
+    meal_type            TEXT,
+    id_doc_type          TEXT,
+    id_doc_series        TEXT,
+    id_doc_number        TEXT,
+    id_doc_issued        TEXT,
+    id_doc_valid_from    TEXT,
+    id_doc_valid_to      TEXT,
+    id_doc_issuer        TEXT,
+    entry_doc_name       TEXT,
+    entry_doc_series     TEXT,
+    entry_doc_number     TEXT,
+    entry_doc_issued     TEXT,
+    entry_doc_valid_from TEXT,
+    entry_doc_valid_to   TEXT,
+    entry_doc_issuer     TEXT,
+    stream               TEXT,
+    depart_country       TEXT,
+    depart_city          TEXT,
+    return_ticket        TEXT,
+    baggage              TEXT,
+    visa_needed          TEXT,
+    transit_visa         TEXT,
+    agree_tickets        TEXT,
+    agree_notice         TEXT,
+    agree_truth          TEXT,
+    agree_extra_docs     TEXT,
+    agree_refusal        TEXT,
+    payload_raw          JSONB
+);
+
+CREATE INDEX IF NOT EXISTS participant_details_created_idx
+    ON participant_details (created_at DESC);
+CREATE INDEX IF NOT EXISTS participant_details_stream_idx
+    ON participant_details (stream);

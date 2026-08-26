@@ -40,8 +40,23 @@ T = {
     "all": "\u0412\u0441\u0435",
     "reset": "\u0421\u0431\u0440\u043e\u0441\u0438\u0442\u044c",
     "excel": "\u0421\u043a\u0430\u0447\u0430\u0442\u044c Excel",
+    "consents": "\u0421\u043a\u0430\u0447\u0430\u0442\u044c \u0441\u043e\u0433\u043b\u0430\u0441\u0438\u044f",
+    "dl_portfolio": "\u0421\u043a\u0430\u0447\u0430\u0442\u044c \u043f\u043e\u0440\u0442\u0444\u043e\u043b\u0438\u043e",
+    "dl_consent": "\u0421\u043a\u0430\u0447\u0430\u0442\u044c \u0441\u043e\u0433\u043b\u0430\u0441\u0438\u0435",
     "logout": "\u0412\u044b\u0439\u0442\u0438",
+    "form1": "\u0424\u043e\u0440\u043c\u0430 1",
+    "form2": "\u0424\u043e\u0440\u043c\u0430 2",
+    "title_apply": "\u0424\u043e\u0440\u043c\u0430 1 \u2014 \u0417\u0430\u044f\u0432\u043a\u0430",
+    "title_info": "\u0424\u043e\u0440\u043c\u0430 2 \u2014 \u0414\u0430\u043d\u043d\u044b\u0435 \u0443\u0447\u0430\u0441\u0442\u043d\u0438\u043a\u043e\u0432",
+    "search": "\u041f\u043e\u0438\u0441\u043a: \u0424\u0418\u041e, email, \u0442\u0435\u043b\u0435\u0444\u043e\u043d, \u0441\u0442\u0440\u0430\u043d\u0430, \u043e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u044f",
+    "search_info": "\u041f\u043e\u0438\u0441\u043a: \u0424\u0418\u041e, \u0441\u0442\u0440\u0430\u043d\u0430, \u0433\u043e\u0440\u043e\u0434, \u043f\u043e\u0442\u043e\u043a",
     "empty": "\u0417\u0430\u044f\u0432\u043e\u043a \u043f\u043e\u043a\u0430 \u043d\u0435\u0442",
+    "empty_info": "\u0410\u043d\u043a\u0435\u0442 \u043f\u043e\u043a\u0430 \u043d\u0435\u0442",
+    "count": "\u0437\u0430\u044f\u0432\u043e\u043a",
+    "count_info": "\u0430\u043d\u043a\u0435\u0442",
+    "th_meal": "\u041f\u0438\u0442\u0430\u043d\u0438\u0435",
+    "th_visa": "\u0412\u0438\u0437\u0430",
+    "th_city": "\u0413\u043e\u0440\u043e\u0434",
     "close": "\u0417\u0430\u043a\u0440\u044b\u0442\u044c",
     "card": "\u041a\u0430\u0440\u0442\u043e\u0447\u043a\u0430 \u0437\u0430\u044f\u0432\u043a\u0438",
     "files": "\u0424\u0430\u0439\u043b\u044b",
@@ -104,8 +119,43 @@ LABELS = {
     "passport_issued": "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d",
 }
 
+LABELS_INFO = {
+    "id": "ID",
+    "created_at": T["th_date"],
+    "fio_latin": "\u0424\u0418\u041e",
+    "health_limits": "\u041e\u0433\u0440\u0430\u043d\u0438\u0447\u0435\u043d\u0438\u044f \u043f\u043e \u0437\u0434\u043e\u0440\u043e\u0432\u044c\u044e",
+    "meal_type": T["th_meal"],
+    "id_doc_type": "\u0422\u0438\u043f \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430",
+    "id_doc_series": "\u0421\u0435\u0440\u0438\u044f \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430",
+    "id_doc_number": "\u041d\u043e\u043c\u0435\u0440 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430",
+    "id_doc_issued": "\u0414\u0430\u0442\u0430 \u0432\u044b\u0434\u0430\u0447\u0438",
+    "id_doc_valid_from": "\u0421\u0440\u043e\u043a \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044f \u0441",
+    "id_doc_valid_to": "\u0421\u0440\u043e\u043a \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044f \u043f\u043e",
+    "id_doc_issuer": "\u041a\u0435\u043c \u0432\u044b\u0434\u0430\u043d",
+    "entry_doc_name": "\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442 \u0434\u043b\u044f \u0432\u044a\u0435\u0437\u0434\u0430 \u0432 \u0420\u0424",
+    "entry_doc_series": "\u0412\u044a\u0435\u0437\u0434: \u0441\u0435\u0440\u0438\u044f",
+    "entry_doc_number": "\u0412\u044a\u0435\u0437\u0434: \u043d\u043e\u043c\u0435\u0440",
+    "entry_doc_issued": "\u0412\u044a\u0435\u0437\u0434: \u0434\u0430\u0442\u0430 \u0432\u044b\u0434\u0430\u0447\u0438",
+    "entry_doc_valid_from": "\u0412\u044a\u0435\u0437\u0434: \u0441\u0440\u043e\u043a \u0441",
+    "entry_doc_valid_to": "\u0412\u044a\u0435\u0437\u0434: \u0441\u0440\u043e\u043a \u043f\u043e",
+    "entry_doc_issuer": "\u0412\u044a\u0435\u0437\u0434: \u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d",
+    "stream": T["stream"],
+    "depart_country": "\u0421\u0442\u0440\u0430\u043d\u0430 \u043e\u0442\u044a\u0435\u0437\u0434\u0430",
+    "depart_city": "\u0413\u043e\u0440\u043e\u0434 \u043e\u0442\u044a\u0435\u0437\u0434\u0430",
+    "return_ticket": "\u041e\u0431\u0440\u0430\u0442\u043d\u044b\u0439 \u0431\u0438\u043b\u0435\u0442",
+    "baggage": "\u0411\u0430\u0433\u0430\u0436",
+    "visa_needed": "\u0412\u0438\u0437\u0430 \u0432 \u0420\u0424",
+    "transit_visa": "\u0422\u0440\u0430\u043d\u0437\u0438\u0442\u043d\u0430\u044f \u0432\u0438\u0437\u0430",
+    "agree_tickets": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0431\u0438\u043b\u0435\u0442\u044b \u0431\u0435\u0437 \u0432\u043e\u0437\u0432\u0440\u0430\u0442\u0430",
+    "agree_notice": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u0435 \u0437\u0430 10 \u0434\u043d\u0435\u0439",
+    "agree_truth": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0434\u043e\u0441\u0442\u043e\u0432\u0435\u0440\u043d\u043e\u0441\u0442\u044c",
+    "agree_extra_docs": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0434\u043e\u043f. \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b",
+    "agree_refusal": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u043e\u0442\u043a\u0430\u0437 \u043f\u0440\u0438 \u0442\u0440\u0443\u0434\u043d\u043e\u0441\u0442\u044f\u0445 \u0432\u044a\u0435\u0437\u0434\u0430",
+}
+
 JS_I18N = json.dumps(T, ensure_ascii=True)
 JS_LABELS = json.dumps(LABELS, ensure_ascii=True)
+JS_LABELS_INFO = json.dumps(LABELS_INFO, ensure_ascii=True)
 
 CSS = r"""
 @import url("https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap");
@@ -125,6 +175,8 @@ input,select{width:100%;padding:11px 12px;border:1px solid rgba(34,63,154,.18);b
 .btn-navy{background:var(--navy);color:#fff}
 .btn-gold{background:var(--gold);color:#fff}
 .btn-ghost{background:transparent;color:var(--navy);border:1px solid rgba(34,63,154,.2)}
+.btn-on{background:var(--navy);color:#fff}
+.btn-off{background:#fff;color:var(--navy);border:1px solid rgba(34,63,154,.2)}
 .err{color:#9a2233;font-size:13px;min-height:18px}
 .top{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
 .filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr auto;gap:10px;padding:16px;margin-bottom:14px}
@@ -143,7 +195,7 @@ tr.row:hover{background:rgba(34,63,154,.04)}
 .kv{margin:0 0 14px}
 .kv b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
 .kv span{white-space:pre-wrap;font-weight:300;line-height:1.5}
-.hidden{display:none!important}
+.drawer .btn{display:inline-flex;align-items:center;margin:8px 8px 0 0;text-decoration:none}
 @media(max-width:960px){.filters{grid-template-columns:1fr 1fr}}
 """
 
@@ -171,11 +223,14 @@ html = f"""<!DOCTYPE html>
     <div class="top">
       <div>
         <p class="kicker">{eh(T['kicker'])}</p>
-        <h1>{eh(T['title'])}</h1>
+        <h1 id="page-title">{eh(T['title_apply'])}</h1>
         <p id="count-line"></p>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-on" id="form-apply" type="button">{eh(T['form1'])}</button>
+        <button class="btn btn-off" id="form-info" type="button">{eh(T['form2'])}</button>
         <button class="btn btn-gold" id="excel-btn" type="button">{eh(T['excel'])}</button>
+        <button class="btn btn-navy" id="consents-btn" type="button">{eh(T['consents'])}</button>
         <button class="btn btn-ghost" id="logout-btn" type="button">{eh(T['logout'])}</button>
       </div>
     </div>
@@ -183,7 +238,7 @@ html = f"""<!DOCTYPE html>
       <input id="f-q" placeholder="{eh(T['search'])}">
       <select id="f-stream"><option value="">{eh(T['stream'])}: {eh(T['all'])}</option></select>
       <select id="f-country"><option value="">{eh(T['country'])}: {eh(T['all'])}</option></select>
-      <select id="f-gender"><option value="">{eh(T['gender'])}: {eh(T['all'])}</option></select>
+      <span id="f-gender-wrap"><select id="f-gender"><option value="">{eh(T['gender'])}: {eh(T['all'])}</option></select></span>
       <input id="f-from" type="date" title="{eh(T['from'])}">
       <input id="f-to" type="date" title="{eh(T['to'])}">
       <button class="btn btn-ghost" id="reset-btn" type="button">{eh(T['reset'])}</button>
@@ -191,7 +246,7 @@ html = f"""<!DOCTYPE html>
     <div class="card">
       <div class="table-wrap">
         <table>
-          <thead>
+          <thead id="thead">
             <tr>
               <th data-sort="id">{eh(T['th_id'])}</th>
               <th data-sort="created_at">{eh(T['th_date'])}</th>
@@ -227,7 +282,8 @@ html = f"""<!DOCTYPE html>
 (function(){{
   var T = {JS_I18N};
   var LABELS = {JS_LABELS};
-  var state = {{ page:1, sort:"created_at", order:"desc" }};
+  var LABELS_INFO = {JS_LABELS_INFO};
+  var state = {{ page:1, sort:"created_at", order:"desc", form:"apply" }};
   var loginView = document.getElementById("login-view");
   var appView = document.getElementById("app-view");
   function qs(){{
@@ -269,18 +325,52 @@ html = f"""<!DOCTYPE html>
   function showApp(){{
     loginView.classList.add("hidden");
     appView.classList.remove("hidden");
-    loadMeta();
-    loadList();
+    try {{
+      var saved = sessionStorage.getItem("mshk-admin-form");
+      if (saved === "info" || saved === "apply") state.form = saved;
+    }} catch (e) {{}}
+    setForm(state.form, true);
   }}
   function showLogin(){{
     appView.classList.add("hidden");
     loginView.classList.remove("hidden");
   }}
+  function isInfo(){{ return state.form === "info"; }}
+  function setForm(form, skipReset){{
+    state.form = form === "info" ? "info" : "apply";
+    try {{ sessionStorage.setItem("mshk-admin-form", state.form); }} catch (e) {{}}
+    document.getElementById("form-apply").className = "btn " + (isInfo() ? "btn-off" : "btn-on");
+    document.getElementById("form-info").className = "btn " + (isInfo() ? "btn-on" : "btn-off");
+    document.getElementById("page-title").textContent = isInfo() ? T.title_info : T.title_apply;
+    document.getElementById("f-q").placeholder = isInfo() ? T.search_info : T.search;
+    document.getElementById("f-gender-wrap").style.display = isInfo() ? "none" : "";
+    document.getElementById("consents-btn").style.display = isInfo() ? "none" : "";
+    if (!skipReset) {{
+      state.page = 1;
+      state.sort = "created_at";
+      state.order = "desc";
+    }}
+    renderHead();
+    loadMeta();
+    loadList();
+  }}
+  function renderHead(){{
+    var head = document.getElementById("thead");
+    var cols = isInfo()
+      ? [["id", T.th_id],["created_at", T.th_date],["fio_latin", T.th_fio],["meal_type", T.th_meal],["depart_country", T.th_country],["depart_city", T.th_city],["visa_needed", T.th_visa],["stream", T.th_stream]]
+      : [["id", T.th_id],["created_at", T.th_date],["fio_latin", T.th_fio],["email", T.th_email],["phone", T.th_phone],["country", T.th_country],["org_name", T.th_org],["stream", T.th_stream]];
+    var html = "<tr>";
+    cols.forEach(function(c){{
+      html += '<th data-sort="' + c[0] + '" data-label="' + c[1] + '">' + c[1] + "</th>";
+    }});
+    html += "</tr>";
+    head.innerHTML = html;
+  }}
   function loadMeta(){{
-    api("/admin/api/meta").then(function(m){{
+    api("/admin/api/meta?form=" + state.form).then(function(m){{
       fillSelect("f-stream", m.streams, T.stream);
       fillSelect("f-country", m.countries, T.country);
-      fillSelect("f-gender", m.genders, T.gender);
+      if (!isInfo()) fillSelect("f-gender", m.genders, T.gender);
     }}).catch(function(){{}});
   }}
   function fillSelect(id, items, label){{
@@ -305,31 +395,44 @@ html = f"""<!DOCTYPE html>
       if (state.sort === key) mark = state.order === "asc" ? " \\u25B2" : " \\u25BC";
       th.textContent = base + mark;
     }});
-    api("/admin/api/applications?" + qs()).then(function(data){{
+    var url = isInfo() ? "/admin/api/participants?" : "/admin/api/applications?";
+    api(url + qs()).then(function(data){{
       var tb = document.getElementById("tbody");
       tb.innerHTML = "";
-      document.getElementById("count-line").textContent = (data.total || 0) + " " + T.count;
+      document.getElementById("count-line").textContent = (data.total || 0) + " " + (isInfo() ? T.count_info : T.count);
       document.getElementById("page-line").textContent = data.page + " / " + data.pages;
       document.getElementById("prev-btn").disabled = data.page <= 1;
       document.getElementById("next-btn").disabled = data.page >= data.pages;
       if (!data.items.length){{
         var tr = document.createElement("tr");
-        tr.innerHTML = '<td colspan="8">' + T.empty + "</td>";
+        tr.innerHTML = '<td colspan="8">' + (isInfo() ? T.empty_info : T.empty) + "</td>";
         tb.appendChild(tr);
         return;
       }}
       data.items.forEach(function(it){{
         var tr = document.createElement("tr");
         tr.className = "row";
-        tr.innerHTML =
-          "<td>" + it.id + "</td>" +
-          "<td>" + fmtDate(it.created_at) + "</td>" +
-          "<td><b>" + esc(it.fio_latin||"") + "</b><br><span style='color:#7a7368'>" + esc(it.fio_ru||"") + "</span></td>" +
-          "<td>" + esc(it.email||"") + "</td>" +
-          "<td>" + esc(it.phone||"") + "</td>" +
-          "<td>" + esc(it.country||"") + "<br>" + esc(it.city||"") + "</td>" +
-          "<td>" + esc(it.org_name||"") + "</td>" +
-          "<td>" + esc(it.stream||"") + "</td>";
+        if (isInfo()) {{
+          tr.innerHTML =
+            "<td>" + it.id + "</td>" +
+            "<td>" + fmtDate(it.created_at) + "</td>" +
+            "<td><b>" + esc(it.fio_latin||"") + "</b></td>" +
+            "<td>" + esc(it.meal_type||"") + "</td>" +
+            "<td>" + esc(it.depart_country||"") + "</td>" +
+            "<td>" + esc(it.depart_city||"") + "</td>" +
+            "<td>" + esc(it.visa_needed||"") + "</td>" +
+            "<td>" + esc(it.stream||"") + "</td>";
+        }} else {{
+          tr.innerHTML =
+            "<td>" + it.id + "</td>" +
+            "<td>" + fmtDate(it.created_at) + "</td>" +
+            "<td><b>" + esc(it.fio_latin||"") + "</b><br><span style='color:#7a7368'>" + esc(it.fio_ru||"") + "</span></td>" +
+            "<td>" + esc(it.email||"") + "</td>" +
+            "<td>" + esc(it.phone||"") + "</td>" +
+            "<td>" + esc(it.country||"") + "<br>" + esc(it.city||"") + "</td>" +
+            "<td>" + esc(it.org_name||"") + "</td>" +
+            "<td>" + esc(it.stream||"") + "</td>";
+        }}
         tr.addEventListener("click", function(){{ openCard(it.id); }});
         tb.appendChild(tr);
       }});
@@ -343,20 +446,24 @@ html = f"""<!DOCTYPE html>
     }});
   }}
   function openCard(id){{
-    api("/admin/api/applications/" + id).then(function(it){{
+    var url = isInfo() ? "/admin/api/participants/" : "/admin/api/applications/";
+    api(url + id).then(function(it){{
       document.getElementById("card-title").textContent = it.fio_latin || ("#" + it.id);
-      var skip = {{payload_raw:1, has_portfolio:1, has_consent:1}};
+      var labels = isInfo() ? LABELS_INFO : LABELS;
+      var skip = {{payload_raw:1, has_portfolio:1, has_consent:1, portfolio_url:1, consent_url:1}};
       var html = "";
-      Object.keys(LABELS).forEach(function(k){{
+      Object.keys(labels).forEach(function(k){{
         if (skip[k]) return;
-        html += '<div class="kv"><b>' + esc(LABELS[k]) + "</b><span>" + esc(fmtVal(it[k])) + "</span></div>";
+        html += '<div class="kv"><b>' + esc(labels[k]) + "</b><span>" + esc(fmtVal(it[k])) + "</span></div>";
       }});
-      html += '<div class="kv"><b>' + T.files + "</b><span>";
-      if (it.has_portfolio) html += '<a href="/admin/api/applications/' + id + '/file/portfolio" target="_blank">' + T.portfolio + "</a><br>";
-      else html += T.portfolio + ": " + T.no_file + "<br>";
-      if (it.has_consent) html += '<a href="/admin/api/applications/' + id + '/file/consent" target="_blank">' + T.consent + "</a>";
-      else html += T.consent + ": " + T.no_file;
-      html += "</span></div>";
+      if (!isInfo()) {{
+        html += '<div class="kv"><b>' + T.files + "</b><span>";
+        if (it.has_portfolio) html += '<a class="btn btn-navy" href="' + (it.portfolio_url || ("/admin/api/applications/" + id + "/file/portfolio")) + '" download>' + T.dl_portfolio + "</a> ";
+        else html += T.portfolio + ": " + T.no_file + "<br>";
+        if (it.has_consent) html += '<a class="btn btn-navy" href="' + (it.consent_url || ("/admin/api/applications/" + id + "/file/consent")) + '" download>' + T.dl_consent + "</a>";
+        else html += T.consent + ": " + T.no_file;
+        html += "</span></div>";
+      }}
       document.getElementById("card-body").innerHTML = html;
       document.getElementById("drawer").classList.add("open");
       document.getElementById("drawer-bg").classList.add("show");
@@ -387,8 +494,14 @@ html = f"""<!DOCTYPE html>
     fetch("/admin/api/logout", {{method:"POST", credentials:"include"}}).finally(showLogin);
   }};
   document.getElementById("excel-btn").onclick = function(){{
-    window.location.href = "/admin/api/applications/export.xlsx?" + qs();
+    var path = isInfo() ? "/admin/api/participants/export.xlsx?" : "/admin/api/applications/export.xlsx?";
+    window.location.href = path + qs();
   }};
+  document.getElementById("consents-btn").onclick = function(){{
+    window.location.href = "/admin/api/consents.zip?" + qs();
+  }};
+  document.getElementById("form-apply").onclick = function(){{ setForm("apply"); }};
+  document.getElementById("form-info").onclick = function(){{ setForm("info"); }};
   ["f-stream","f-country","f-gender","f-from","f-to"].forEach(function(id){{
     document.getElementById(id).addEventListener("change", function(){{ state.page = 1; loadList(); }});
   }});
@@ -407,19 +520,21 @@ html = f"""<!DOCTYPE html>
     document.getElementById("f-gender").value = "";
     document.getElementById("f-from").value = "";
     document.getElementById("f-to").value = "";
-    state = {{ page:1, sort:"created_at", order:"desc" }};
+    state.page = 1;
+    state.sort = "created_at";
+    state.order = "desc";
     loadList();
   }};
   document.getElementById("prev-btn").onclick = function(){{ if (state.page>1){{ state.page--; loadList(); }} }};
   document.getElementById("next-btn").onclick = function(){{ state.page++; loadList(); }};
-  document.querySelectorAll("th[data-sort]").forEach(function(th){{
-    th.addEventListener("click", function(){{
-      var key = th.getAttribute("data-sort");
-      if (state.sort === key) state.order = state.order === "asc" ? "desc" : "asc";
-      else {{ state.sort = key; state.order = "asc"; }}
-      state.page = 1;
-      loadList();
-    }});
+  document.getElementById("thead").addEventListener("click", function(e){{
+    var th = e.target.closest("th[data-sort]");
+    if (!th) return;
+    var key = th.getAttribute("data-sort");
+    if (state.sort === key) state.order = state.order === "asc" ? "desc" : "asc";
+    else {{ state.sort = key; state.order = "asc"; }}
+    state.page = 1;
+    loadList();
   }});
   document.getElementById("close-btn").onclick = closeCard;
   document.getElementById("drawer-bg").onclick = closeCard;

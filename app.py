@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 import psycopg
 from psycopg.types.json import Json
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -147,7 +147,7 @@ def save_upload(kind: str, upload: UploadFile, allowed: set[str]) -> str:
     name = f"{uuid.uuid4().hex}_{kind}{suffix}"
     path = UPLOAD_DIR / name
     path.write_bytes(data)
-    return str(path)
+    return name
 
 
 @app.get("/health")
@@ -164,6 +164,51 @@ def health():
     return {"ok": True, "db": db_ok, "db_error": db_error}
 
 
+INFO_COLS = [
+    "fio_latin",
+    "health_limits",
+    "meal_type",
+    "id_doc_type",
+    "id_doc_series",
+    "id_doc_number",
+    "id_doc_issued",
+    "id_doc_valid_from",
+    "id_doc_valid_to",
+    "id_doc_issuer",
+    "entry_doc_name",
+    "entry_doc_series",
+    "entry_doc_number",
+    "entry_doc_issued",
+    "entry_doc_valid_from",
+    "entry_doc_valid_to",
+    "entry_doc_issuer",
+    "stream",
+    "depart_country",
+    "depart_city",
+    "return_ticket",
+    "baggage",
+    "visa_needed",
+    "transit_visa",
+    "agree_tickets",
+    "agree_notice",
+    "agree_truth",
+    "agree_extra_docs",
+    "agree_refusal",
+    "payload_raw",
+]
+
+
+def as_yes_no(value) -> str:
+    if value is True:
+        return "\u0434\u0430"
+    if value is False or value is None:
+        return "\u043d\u0435\u0442"
+    text = str(value).strip().lower()
+    if text in ("1", "true", "yes", "da", "\u0434\u0430"):
+        return "\u0434\u0430"
+    return "\u043d\u0435\u0442"
+
+
 @app.get("/")
 def index():
     path = ROOT / "static" / "index.html"
@@ -171,6 +216,15 @@ def index():
         path = ROOT / "tilda" / "preview-apply.html"
     if not path.exists():
         raise HTTPException(404, "frontend is missing")
+    return FileResponse(path, media_type="text/html; charset=utf-8")
+
+
+@app.get("/info")
+@app.get("/info/")
+def info_page():
+    path = ROOT / "static" / "info.html"
+    if not path.exists():
+        raise HTTPException(404, "info form is missing")
     return FileResponse(path, media_type="text/html; charset=utf-8")
 
 
@@ -324,6 +378,67 @@ def apply(
             conn.commit()
     except Exception:
         log.exception("insert failed")
+        raise HTTPException(500, "database error")
+
+    return JSONResponse({"ok": True, "id": row[0] if row else None})
+
+
+@app.post("/info")
+async def info_submit(request: Request):
+    if not DATABASE_URL:
+        raise HTTPException(500, "DATABASE_URL is not set")
+    ctype = (request.headers.get("content-type") or "").lower()
+    try:
+        if "application/json" in ctype:
+            data = await request.json()
+        else:
+            form = await request.form()
+            data = json.loads(str(form.get("payload") or "{}"))
+    except Exception:
+        raise HTTPException(400, "payload must be JSON")
+    if not isinstance(data, dict):
+        raise HTTPException(400, "payload must be an object")
+    if not str(data.get("fio_latin") or "").strip():
+        raise HTTPException(400, "fio_latin required")
+    if not str(data.get("stream") or "").strip():
+        raise HTTPException(400, "stream required")
+
+    bool_cols = {
+        "agree_tickets",
+        "agree_notice",
+        "agree_truth",
+        "agree_extra_docs",
+        "agree_refusal",
+    }
+    values = []
+    for col in INFO_COLS:
+        if col == "payload_raw":
+            values.append(Json(data))
+            continue
+        val = data.get(col)
+        if col in bool_cols:
+            values.append(as_yes_no(val))
+        elif isinstance(val, (list, dict)):
+            values.append(json.dumps(val, ensure_ascii=False))
+        else:
+            values.append(None if val is None else str(val).strip())
+
+    placeholders = ", ".join(["%s"] * len(INFO_COLS))
+    sql = (
+        "INSERT INTO participant_details ("
+        + ", ".join(INFO_COLS)
+        + ") VALUES ("
+        + placeholders
+        + ") RETURNING id"
+    )
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, values)
+                row = cur.fetchone()
+            conn.commit()
+    except Exception:
+        log.exception("info insert failed")
         raise HTTPException(500, "database error")
 
     return JSONResponse({"ok": True, "id": row[0] if row else None})

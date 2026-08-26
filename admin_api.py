@@ -2,10 +2,13 @@ import hashlib
 import hmac
 import json
 import os
+import re
 import time
+import zipfile
 from io import BytesIO
 from pathlib import Path
 from typing import Optional
+from urllib.parse import quote
 
 import psycopg
 from fastapi import APIRouter, Cookie, HTTPException, Request
@@ -26,6 +29,17 @@ SORTABLE = {
     "city": "city",
     "org_name": "org_name",
     "stream": "stream",
+}
+
+SORTABLE_INFO = {
+    "id": "id",
+    "created_at": "created_at",
+    "fio_latin": "fio_latin",
+    "meal_type": "meal_type",
+    "stream": "stream",
+    "depart_country": "depart_country",
+    "depart_city": "depart_city",
+    "visa_needed": "visa_needed",
 }
 
 EXCEL_COLUMNS = [
@@ -67,8 +81,42 @@ EXCEL_COLUMNS = [
     ("passport_number", "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u043d\u043e\u043c\u0435\u0440"),
     ("passport_date", "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u0434\u0430\u0442\u0430"),
     ("passport_issued", "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d"),
-    ("has_portfolio", "\u041f\u043e\u0440\u0442\u0444\u043e\u043b\u0438\u043e"),
-    ("has_consent", "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435"),
+    ("portfolio_url", "\u041f\u043e\u0440\u0442\u0444\u043e\u043b\u0438\u043e (\u0441\u0441\u044b\u043b\u043a\u0430)"),
+    ("consent_url", "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435 (\u0441\u0441\u044b\u043b\u043a\u0430)"),
+]
+
+INFO_EXCEL_COLUMNS = [
+    ("id", "ID"),
+    ("created_at", "\u0414\u0430\u0442\u0430 \u043f\u043e\u0434\u0430\u0447\u0438"),
+    ("fio_latin", "\u0424\u0418\u041e"),
+    ("health_limits", "\u041e\u0433\u0440\u0430\u043d\u0438\u0447\u0435\u043d\u0438\u044f \u043f\u043e \u0437\u0434\u043e\u0440\u043e\u0432\u044c\u044e"),
+    ("meal_type", "\u0422\u0438\u043f \u043f\u0438\u0442\u0430\u043d\u0438\u044f"),
+    ("id_doc_type", "\u0422\u0438\u043f \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430"),
+    ("id_doc_series", "\u0421\u0435\u0440\u0438\u044f \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430"),
+    ("id_doc_number", "\u041d\u043e\u043c\u0435\u0440 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430"),
+    ("id_doc_issued", "\u0414\u0430\u0442\u0430 \u0432\u044b\u0434\u0430\u0447\u0438"),
+    ("id_doc_valid_from", "\u0421\u0440\u043e\u043a \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044f \u0441"),
+    ("id_doc_valid_to", "\u0421\u0440\u043e\u043a \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044f \u043f\u043e"),
+    ("id_doc_issuer", "\u041a\u0435\u043c \u0432\u044b\u0434\u0430\u043d"),
+    ("entry_doc_name", "\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442 \u0434\u043b\u044f \u0432\u044a\u0435\u0437\u0434\u0430 \u0432 \u0420\u0424"),
+    ("entry_doc_series", "\u0412\u044a\u0435\u0437\u0434: \u0441\u0435\u0440\u0438\u044f"),
+    ("entry_doc_number", "\u0412\u044a\u0435\u0437\u0434: \u043d\u043e\u043c\u0435\u0440"),
+    ("entry_doc_issued", "\u0412\u044a\u0435\u0437\u0434: \u0434\u0430\u0442\u0430 \u0432\u044b\u0434\u0430\u0447\u0438"),
+    ("entry_doc_valid_from", "\u0412\u044a\u0435\u0437\u0434: \u0441\u0440\u043e\u043a \u0441"),
+    ("entry_doc_valid_to", "\u0412\u044a\u0435\u0437\u0434: \u0441\u0440\u043e\u043a \u043f\u043e"),
+    ("entry_doc_issuer", "\u0412\u044a\u0435\u0437\u0434: \u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d"),
+    ("stream", "\u041f\u043e\u0442\u043e\u043a"),
+    ("depart_country", "\u0421\u0442\u0440\u0430\u043d\u0430 \u043e\u0442\u044a\u0435\u0437\u0434\u0430"),
+    ("depart_city", "\u0413\u043e\u0440\u043e\u0434 \u043e\u0442\u044a\u0435\u0437\u0434\u0430"),
+    ("return_ticket", "\u041e\u0431\u0440\u0430\u0442\u043d\u044b\u0439 \u0431\u0438\u043b\u0435\u0442"),
+    ("baggage", "\u0411\u0430\u0433\u0430\u0436"),
+    ("visa_needed", "\u0412\u0438\u0437\u0430 \u0432 \u0420\u0424"),
+    ("transit_visa", "\u0422\u0440\u0430\u043d\u0437\u0438\u0442\u043d\u0430\u044f \u0432\u0438\u0437\u0430"),
+    ("agree_tickets", "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0431\u0438\u043b\u0435\u0442\u044b \u0431\u0435\u0437 \u0432\u043e\u0437\u0432\u0440\u0430\u0442\u0430"),
+    ("agree_notice", "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u0435 \u0437\u0430 10 \u0434\u043d\u0435\u0439"),
+    ("agree_truth", "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0434\u043e\u0441\u0442\u043e\u0432\u0435\u0440\u043d\u043e\u0441\u0442\u044c \u0441\u0432\u0435\u0434\u0435\u043d\u0438\u0439"),
+    ("agree_extra_docs", "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0434\u043e\u043f. \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b"),
+    ("agree_refusal", "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u043e\u0442\u043a\u0430\u0437 \u043f\u0440\u0438 \u0442\u0440\u0443\u0434\u043d\u043e\u0441\u0442\u044f\u0445 \u0432\u044a\u0435\u0437\u0434\u0430"),
 ]
 
 
@@ -106,6 +154,132 @@ def require_admin(mashuk_admin: Optional[str] = Cookie(default=None)):
     if not _check_token(mashuk_admin):
         raise HTTPException(401, "unauthorized")
     return True
+
+
+def public_origin(request: Request) -> str:
+    env = (os.environ.get("PUBLIC_BASE_URL") or "").strip().rstrip("/")
+    if env:
+        return env
+    proto = request.headers.get("x-forwarded-proto") or request.url.scheme
+    host = request.headers.get("x-forwarded-host") or request.headers.get("host")
+    if host:
+        return proto + "://" + host.split(",")[0].strip()
+    return str(request.base_url).rstrip("/")
+
+
+def file_token(kind: str, app_id: int) -> str:
+    msg = ("file:%s:%s" % (kind, int(app_id))).encode("utf-8")
+    return hmac.new(_secret(), msg, hashlib.sha256).hexdigest()
+
+
+def file_url(request: Request, app_id: int, kind: str) -> str:
+    return (
+        public_origin(request)
+        + "/admin/api/applications/%s/file/%s?t=%s"
+        % (int(app_id), kind, file_token(kind, app_id))
+    )
+
+
+def allow_file_access(
+    kind: str,
+    app_id: int,
+    token: Optional[str],
+    mashuk_admin: Optional[str],
+) -> None:
+    expect = file_token(kind, app_id)
+    given = str(token or "")
+    if given and len(given) == len(expect) and hmac.compare_digest(given, expect):
+        return
+    require_admin(mashuk_admin)
+
+
+def upload_dirs() -> list[Path]:
+    here = Path(__file__).resolve().parent
+    raw = (os.environ.get("UPLOAD_DIR") or "").strip()
+    candidates = []
+    if raw:
+        p = Path(raw)
+        candidates.append(p if p.is_absolute() else (here / p))
+        candidates.append(Path.cwd() / raw)
+    candidates.extend(
+        [
+            here / "uploads",
+            Path.cwd() / "uploads",
+            here / "health" / "uploads",
+            Path.cwd().parent / "uploads",
+        ]
+    )
+    out = []
+    seen = set()
+    for folder in candidates:
+        try:
+            resolved = folder.resolve()
+        except Exception:
+            continue
+        key = str(resolved).lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(resolved)
+    return out
+
+
+def find_upload(stored: str) -> Path:
+    name = Path(str(stored or "")).name
+    if not name or name in (".", ".."):
+        raise HTTPException(404, "file not found")
+    for folder in upload_dirs():
+        if not folder.is_dir():
+            continue
+        cand = (folder / name).resolve()
+        try:
+            cand.relative_to(folder)
+        except ValueError:
+            continue
+        if cand.is_file():
+            return cand
+    raise HTTPException(404, "file not found")
+
+
+def safe_fio_name(row: dict) -> str:
+    raw = str(row.get("fio_latin") or row.get("fio_ru") or "").strip()
+    raw = re.sub(r"[^\w\s\-]+", "", raw, flags=re.UNICODE)
+    raw = re.sub(r"\s+", "_", raw).strip("._")
+    return raw or ("id_%s" % row.get("id"))
+
+
+def download_name(row: dict, kind: str, suffix: str) -> str:
+    base = safe_fio_name(row)
+    if kind == "consent":
+        return base + (suffix or ".pdf")
+    return "%s_portfolio%s" % (base, suffix or ".pdf")
+
+
+def unique_name(name: str, used: set) -> str:
+    stem = Path(name).stem
+    suffix = Path(name).suffix
+    out = name
+    n = 2
+    key = out.lower()
+    while key in used:
+        out = "%s_%s%s" % (stem, n, suffix)
+        key = out.lower()
+        n += 1
+    used.add(key)
+    return out
+
+
+def send_download(path: Path, name: str) -> FileResponse:
+    ascii_name = "file" + (path.suffix or "")
+    headers = {
+        "Content-Disposition": (
+            "attachment; filename=\""
+            + ascii_name
+            + "\"; filename*=UTF-8''"
+            + quote(name)
+        )
+    }
+    return FileResponse(path, filename=name, headers=headers)
 
 
 def db():
@@ -187,6 +361,48 @@ def where_sql(f):
     return " AND ".join(clauses), args
 
 
+def parse_info_filters(request: Request):
+    q = request.query_params
+    return {
+        "q": (q.get("q") or "").strip(),
+        "stream": (q.get("stream") or "").strip(),
+        "country": (q.get("country") or "").strip(),
+        "date_from": (q.get("date_from") or "").strip(),
+        "date_to": (q.get("date_to") or "").strip(),
+        "sort": SORTABLE_INFO.get(q.get("sort") or "created_at", "created_at"),
+        "order": "ASC" if (q.get("order") or "").lower() == "asc" else "DESC",
+        "page": max(1, int(q.get("page") or 1)),
+        "limit": min(100, max(10, int(q.get("limit") or 50))),
+    }
+
+
+def where_info_sql(f):
+    clauses = ["TRUE"]
+    args = []
+    if f["q"]:
+        like = "%" + f["q"] + "%"
+        clauses.append(
+            "("
+            "fio_latin ILIKE %s OR depart_country ILIKE %s OR depart_city ILIKE %s "
+            "OR stream ILIKE %s OR meal_type ILIKE %s OR id_doc_number ILIKE %s"
+            ")"
+        )
+        args.extend([like] * 6)
+    if f["stream"]:
+        clauses.append("stream = %s")
+        args.append(f["stream"])
+    if f["country"]:
+        clauses.append("depart_country ILIKE %s")
+        args.append("%" + f["country"] + "%")
+    if f["date_from"]:
+        clauses.append("created_at::date >= %s")
+        args.append(f["date_from"])
+    if f["date_to"]:
+        clauses.append("created_at::date <= %s")
+        args.append(f["date_to"])
+    return " AND ".join(clauses), args
+
+
 router = APIRouter()
 
 
@@ -231,30 +447,34 @@ def me(mashuk_admin: Optional[str] = Cookie(default=None)):
 
 
 @router.get("/api/meta")
-def meta(mashuk_admin: Optional[str] = Cookie(default=None)):
+def meta(request: Request, mashuk_admin: Optional[str] = Cookie(default=None)):
     require_admin(mashuk_admin)
+    form = (request.query_params.get("form") or "apply").strip().lower()
+    table = "participant_details" if form == "info" else "seminar_applications"
+    country_col = "depart_country" if form == "info" else "country"
     with db() as conn:
         with conn.cursor() as cur:
-            cur.execute(
-                "SELECT COUNT(*) FROM seminar_applications"
-            )
+            cur.execute(f"SELECT COUNT(*) FROM {table}")
             total = cur.fetchone()[0]
             cur.execute(
-                "SELECT DISTINCT stream FROM seminar_applications "
+                f"SELECT DISTINCT stream FROM {table} "
                 "WHERE stream IS NOT NULL AND stream <> '' ORDER BY 1"
             )
             streams = [r[0] for r in cur.fetchall()]
             cur.execute(
-                "SELECT DISTINCT country FROM seminar_applications "
-                "WHERE country IS NOT NULL AND country <> '' ORDER BY 1"
+                f"SELECT DISTINCT {country_col} FROM {table} "
+                f"WHERE {country_col} IS NOT NULL AND {country_col} <> '' ORDER BY 1"
             )
             countries = [r[0] for r in cur.fetchall()]
-            cur.execute(
-                "SELECT DISTINCT gender FROM seminar_applications "
-                "WHERE gender IS NOT NULL AND gender <> '' ORDER BY 1"
-            )
-            genders = [r[0] for r in cur.fetchall()]
+            genders = []
+            if form != "info":
+                cur.execute(
+                    "SELECT DISTINCT gender FROM seminar_applications "
+                    "WHERE gender IS NOT NULL AND gender <> '' ORDER BY 1"
+                )
+                genders = [r[0] for r in cur.fetchall()]
     return {
+        "form": form,
         "total": total,
         "streams": streams,
         "countries": countries,
@@ -301,49 +521,76 @@ def export_xlsx(request: Request, mashuk_admin: Optional[str] = Cookie(default=N
     f = parse_filters(request)
     where, args = where_sql(f)
     sql = (
-        "SELECT *, "
-        "(portfolio_path IS NOT NULL AND portfolio_path <> '') AS has_portfolio, "
-        "(consent_path IS NOT NULL AND consent_path <> '') AS has_consent "
-        f"FROM seminar_applications WHERE {where} ORDER BY {f['sort']} {f['order']} NULLS LAST"
-    )
+        "SELECT * FROM seminar_applications WHERE {where} "
+        "ORDER BY {sort} {order} NULLS LAST"
+    ).format(where=where, sort=f["sort"], order=f["order"])
     with db() as conn:
         with conn.cursor() as cur:
             cur.execute(sql, args)
             rows = as_dicts(cur)
-    yes = "\u0434\u0430"
-    no = "\u043d\u0435\u0442"
     for row in rows:
-        row["has_portfolio"] = yes if row.get("has_portfolio") else no
-        row["has_consent"] = yes if row.get("has_consent") else no
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Zayavki"
-    header_font = Font(bold=True, color="FFFFFF")
-    header_fill = PatternFill("solid", fgColor="223F9A")
-    for i, (_key, title) in enumerate(EXCEL_COLUMNS, 1):
-        cell_ref = ws.cell(1, i, title)
-        cell_ref.font = header_font
-        cell_ref.fill = header_fill
-        cell_ref.alignment = Alignment(wrap_text=True, vertical="center")
-    for r_i, row in enumerate(rows, 2):
-        for c_i, (key, _title) in enumerate(EXCEL_COLUMNS, 1):
-            ws.cell(r_i, c_i, cell(row.get(key)))
-    ws.auto_filter.ref = f"A1:{get_column_letter(len(EXCEL_COLUMNS))}{max(1, len(rows)+1)}"
-    ws.freeze_panes = "A2"
-    for i in range(1, len(EXCEL_COLUMNS) + 1):
-        ws.column_dimensions[get_column_letter(i)].width = 22
+        app_id = int(row["id"])
+        row["portfolio_url"] = (
+            file_url(request, app_id, "portfolio") if row.get("portfolio_path") else ""
+        )
+        row["consent_url"] = (
+            file_url(request, app_id, "consent") if row.get("consent_path") else ""
+        )
+    return _xlsx(
+        rows,
+        EXCEL_COLUMNS,
+        "Zayavki",
+        "mashuk_zayavki.xlsx",
+        link_keys=("portfolio_url", "consent_url"),
+    )
+
+
+@router.get("/api/consents.zip")
+def export_consents_zip(request: Request, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    f = parse_filters(request)
+    where, args = where_sql(f)
+    sql = (
+        "SELECT id, fio_latin, fio_ru, consent_path FROM seminar_applications "
+        "WHERE {where} AND consent_path IS NOT NULL AND consent_path <> '' "
+        "ORDER BY {sort} {order} NULLS LAST"
+    ).format(where=where, sort=f["sort"], order=f["order"])
+    with db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql, args)
+            rows = as_dicts(cur)
     buf = BytesIO()
-    wb.save(buf)
-    filename = "mashuk_zayavki.xlsx"
+    used = set()
+    added = 0
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        for row in rows:
+            try:
+                path = find_upload(row.get("consent_path") or "")
+            except HTTPException:
+                continue
+            name = unique_name(
+                download_name(row, "consent", path.suffix.lower() or ".pdf"),
+                used,
+            )
+            zf.write(path, name)
+            added += 1
+    if not added:
+        raise HTTPException(404, "no consent files")
     return Response(
         content=buf.getvalue(),
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": 'attachment; filename="mashuk_soglasia.zip"'
+        },
     )
 
 
 @router.get("/api/applications/{app_id}")
-def get_application(app_id: int, mashuk_admin: Optional[str] = Cookie(default=None)):
+def get_application(
+    app_id: int,
+    request: Request,
+    mashuk_admin: Optional[str] = Cookie(default=None),
+):
     require_admin(mashuk_admin)
     with db() as conn:
         with conn.cursor() as cur:
@@ -356,44 +603,138 @@ def get_application(app_id: int, mashuk_admin: Optional[str] = Cookie(default=No
     item = items[0]
     item["has_portfolio"] = bool(item.get("portfolio_path"))
     item["has_consent"] = bool(item.get("consent_path"))
+    item["portfolio_url"] = (
+        file_url(request, app_id, "portfolio") if item["has_portfolio"] else ""
+    )
+    item["consent_url"] = (
+        file_url(request, app_id, "consent") if item["has_consent"] else ""
+    )
     item.pop("portfolio_path", None)
     item.pop("consent_path", None)
     return item
-
-
-def _safe_file(stored: str, upload_dir: Path) -> Path:
-    path = Path(stored)
-    if not path.is_absolute():
-        path = (upload_dir / path).resolve()
-    else:
-        path = path.resolve()
-    root = upload_dir.resolve()
-    if root not in path.parents and path != root:
-        raise HTTPException(404, "file not found")
-    if not path.exists() or not path.is_file():
-        raise HTTPException(404, "file not found")
-    return path
 
 
 @router.get("/api/applications/{app_id}/file/{kind}")
 def get_file(
     app_id: int,
     kind: str,
+    t: Optional[str] = None,
     mashuk_admin: Optional[str] = Cookie(default=None),
 ):
-    require_admin(mashuk_admin)
     if kind not in ("portfolio", "consent"):
         raise HTTPException(404, "unknown file")
+    allow_file_access(kind, app_id, t, mashuk_admin)
     col = "portfolio_path" if kind == "portfolio" else "consent_path"
     with db() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                f"SELECT {col} FROM seminar_applications WHERE id = %s",
+                f"SELECT {col}, fio_latin, fio_ru FROM seminar_applications WHERE id = %s",
                 (app_id,),
             )
             row = cur.fetchone()
     if not row or not row[0]:
         raise HTTPException(404, "file not found")
-    upload_dir = Path(os.environ.get("UPLOAD_DIR", "./uploads")).resolve()
-    path = _safe_file(row[0], upload_dir)
-    return FileResponse(path, filename=path.name)
+    path = find_upload(row[0])
+    name = download_name(
+        {"id": app_id, "fio_latin": row[1], "fio_ru": row[2]},
+        kind,
+        path.suffix.lower() or ".pdf",
+    )
+    return send_download(path, name)
+
+
+def _xlsx(rows, columns, sheet_name, filename, link_keys=()):
+    links = set(link_keys or ())
+    wb = Workbook()
+    ws = wb.active
+    ws.title = sheet_name
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill("solid", fgColor="223F9A")
+    link_font = Font(color="0563C1", underline="single")
+    for i, (_key, title) in enumerate(columns, 1):
+        cell_ref = ws.cell(1, i, title)
+        cell_ref.font = header_font
+        cell_ref.fill = header_fill
+        cell_ref.alignment = Alignment(wrap_text=True, vertical="center")
+    for r_i, row in enumerate(rows, 2):
+        for c_i, (key, _title) in enumerate(columns, 1):
+            value = cell(row.get(key))
+            ref = ws.cell(r_i, c_i, value)
+            if key in links and value:
+                ref.hyperlink = value
+                ref.font = link_font
+    ws.auto_filter.ref = f"A1:{get_column_letter(len(columns))}{max(1, len(rows)+1)}"
+    ws.freeze_panes = "A2"
+    for i, (key, _title) in enumerate(columns, 1):
+        ws.column_dimensions[get_column_letter(i)].width = 48 if key in links else 22
+    buf = BytesIO()
+    wb.save(buf)
+    return Response(
+        content=buf.getvalue(),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@router.get("/api/participants")
+def list_participants(request: Request, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    f = parse_info_filters(request)
+    where, args = where_info_sql(f)
+    offset = (f["page"] - 1) * f["limit"]
+    sql_count = f"SELECT COUNT(*) FROM participant_details WHERE {where}"
+    sql = (
+        "SELECT id, created_at, fio_latin, meal_type, stream, depart_country, "
+        "depart_city, visa_needed, transit_visa, return_ticket, baggage "
+        f"FROM participant_details WHERE {where} "
+        f"ORDER BY {f['sort']} {f['order']} NULLS LAST "
+        "LIMIT %s OFFSET %s"
+    )
+    with db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql_count, args)
+            total = cur.fetchone()[0]
+            cur.execute(sql, args + [f["limit"], offset])
+            items = as_dicts(cur)
+    return {
+        "items": items,
+        "total": total,
+        "page": f["page"],
+        "limit": f["limit"],
+        "pages": max(1, (total + f["limit"] - 1) // f["limit"]),
+        "sort": f["sort"],
+        "order": f["order"].lower(),
+    }
+
+
+@router.get("/api/participants/export.xlsx")
+def export_participants_xlsx(request: Request, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    f = parse_info_filters(request)
+    where, args = where_info_sql(f)
+    sql = (
+        f"SELECT * FROM participant_details WHERE {where} "
+        f"ORDER BY {f['sort']} {f['order']} NULLS LAST"
+    )
+    with db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql, args)
+            rows = as_dicts(cur)
+    return _xlsx(rows, INFO_EXCEL_COLUMNS, "Uchastniki", "mashuk_uchastniki.xlsx")
+
+
+@router.get("/api/participants/{item_id}")
+def get_participant(item_id: int, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    with db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT * FROM participant_details WHERE id = %s", (item_id,)
+            )
+            items = as_dicts(cur)
+    if not items:
+        raise HTTPException(404, "not found")
+    item = items[0]
+    item.pop("payload_raw", None)
+    return item
+
