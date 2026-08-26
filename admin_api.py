@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import json
+import logging
 import os
 import re
 import time
@@ -12,12 +13,25 @@ from urllib.parse import quote
 
 import psycopg
 from fastapi import APIRouter, Cookie, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse, Response
+from fastapi.responses import JSONResponse, Response
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
+log = logging.getLogger("mashuk.admin")
+UPLOAD_NAME = re.compile(
+    r"^[0-9a-fA-F]{32}_(portfolio|consent)\.[A-Za-z0-9]{1,8}$"
+)
+MEDIA_TYPES = {
+    ".pdf": "application/pdf",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".doc": "application/msword",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+}
 COOKIE = "mashuk_admin"
+ROOT = Path(__file__).resolve().parent
 SORTABLE = {
     "id": "id",
     "created_at": "created_at",
@@ -160,11 +174,24 @@ def public_origin(request: Request) -> str:
     env = (os.environ.get("PUBLIC_BASE_URL") or "").strip().rstrip("/")
     if env:
         return env
-    proto = request.headers.get("x-forwarded-proto") or request.url.scheme
-    host = request.headers.get("x-forwarded-host") or request.headers.get("host")
-    if host:
-        return proto + "://" + host.split(",")[0].strip()
-    return str(request.base_url).rstrip("/")
+    proto = (
+        request.headers.get("x-forwarded-proto") or request.url.scheme or "https"
+    ).split(",")[0].strip()
+    if proto != "https" and request.headers.get("x-forwarded-ssl", "").lower() == "on":
+        proto = "https"
+    host = (
+        request.headers.get("x-forwarded-host")
+        or request.headers.get("host")
+        or request.url.netloc
+    ).split(",")[0].strip()
+    return proto + "://" + host
+
+
+def cookie_secure(request: Request) -> bool:
+    proto = (
+        request.headers.get("x-forwarded-proto") or request.url.scheme or ""
+    ).split(",")[0].strip().lower()
+    return proto == "https"
 
 
 def file_token(kind: str, app_id: int) -> str:
@@ -193,20 +220,28 @@ def allow_file_access(
     require_admin(mashuk_admin)
 
 
-def upload_dirs() -> list[Path]:
-    here = Path(__file__).resolve().parent
+def primary_upload_dir() -> Path:
     raw = (os.environ.get("UPLOAD_DIR") or "").strip()
-    candidates = []
+    if not raw:
+        return (ROOT / "uploads").resolve()
+    p = Path(raw)
+    return p.resolve() if p.is_absolute() else (ROOT / p).resolve()
+
+
+def upload_dirs() -> list[Path]:
+    raw = (os.environ.get("UPLOAD_DIR") or "").strip()
+    candidates = [primary_upload_dir()]
     if raw:
         p = Path(raw)
-        candidates.append(p if p.is_absolute() else (here / p))
-        candidates.append(Path.cwd() / raw)
+        candidates.append(p if p.is_absolute() else Path.cwd() / p)
     candidates.extend(
         [
-            here / "uploads",
+            ROOT / "uploads",
             Path.cwd() / "uploads",
-            here / "health" / "uploads",
+            ROOT / "health" / "uploads",
             Path.cwd().parent / "uploads",
+            Path("/app/uploads"),
+            Path("/app/health/uploads"),
         ]
     )
     out = []
@@ -225,20 +260,63 @@ def upload_dirs() -> list[Path]:
 
 
 def find_upload(stored: str) -> Path:
-    name = Path(str(stored or "")).name
+    stored = str(stored or "").strip().replace("\\", "/")
+    name = Path(stored).name
     if not name or name in (".", ".."):
         raise HTTPException(404, "file not found")
-    for folder in upload_dirs():
-        if not folder.is_dir():
-            continue
-        cand = (folder / name).resolve()
+    folders = upload_dirs()
+    candidates = []
+    raw = Path(stored)
+    if stored and raw.is_absolute():
+        candidates.append(raw)
+    for folder in folders:
+        candidates.append(folder / name)
+    seen = set()
+    for cand in candidates:
         try:
-            cand.relative_to(folder)
-        except ValueError:
+            resolved = cand.resolve()
+        except Exception:
             continue
-        if cand.is_file():
-            return cand
+        key = str(resolved).lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        if not resolved.is_file():
+            continue
+        in_uploads = False
+        for folder in folders:
+            try:
+                resolved.relative_to(folder)
+                in_uploads = True
+                break
+            except ValueError:
+                continue
+        if in_uploads or UPLOAD_NAME.match(resolved.name):
+            return resolved
+    log.warning(
+        "upload missing name=%s stored=%s dirs=%s",
+        name,
+        stored,
+        [str(d) for d in folders],
+    )
     raise HTTPException(404, "file not found")
+
+
+def send_download(path: Path, name: str) -> Response:
+    suffix = path.suffix.lower()
+    media = MEDIA_TYPES.get(suffix, "application/octet-stream")
+    ascii_name = "file" + suffix
+    headers = {
+        "Content-Disposition": (
+            "attachment; filename=\""
+            + ascii_name
+            + "\"; filename*=UTF-8''"
+            + quote(name)
+        ),
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+    }
+    return Response(content=path.read_bytes(), media_type=media, headers=headers)
 
 
 def safe_fio_name(row: dict) -> str:
@@ -267,19 +345,6 @@ def unique_name(name: str, used: set) -> str:
         n += 1
     used.add(key)
     return out
-
-
-def send_download(path: Path, name: str) -> FileResponse:
-    ascii_name = "file" + (path.suffix or "")
-    headers = {
-        "Content-Disposition": (
-            "attachment; filename=\""
-            + ascii_name
-            + "\"; filename*=UTF-8''"
-            + quote(name)
-        )
-    }
-    return FileResponse(path, filename=name, headers=headers)
 
 
 def db():
@@ -315,6 +380,14 @@ def cell(v) -> str:
     return str(v)
 
 
+def _int_param(raw, default: int, lo: int, hi: int) -> int:
+    try:
+        n = int(raw)
+    except (TypeError, ValueError):
+        n = default
+    return min(hi, max(lo, n))
+
+
 def parse_filters(request: Request):
     q = request.query_params
     return {
@@ -326,8 +399,8 @@ def parse_filters(request: Request):
         "date_to": (q.get("date_to") or "").strip(),
         "sort": SORTABLE.get(q.get("sort") or "created_at", "created_at"),
         "order": "ASC" if (q.get("order") or "").lower() == "asc" else "DESC",
-        "page": max(1, int(q.get("page") or 1)),
-        "limit": min(100, max(10, int(q.get("limit") or 50))),
+        "page": _int_param(q.get("page"), 1, 1, 100000),
+        "limit": _int_param(q.get("limit"), 50, 10, 100),
     }
 
 
@@ -371,8 +444,8 @@ def parse_info_filters(request: Request):
         "date_to": (q.get("date_to") or "").strip(),
         "sort": SORTABLE_INFO.get(q.get("sort") or "created_at", "created_at"),
         "order": "ASC" if (q.get("order") or "").lower() == "asc" else "DESC",
-        "page": max(1, int(q.get("page") or 1)),
-        "limit": min(100, max(10, int(q.get("limit") or 50))),
+        "page": _int_param(q.get("page"), 1, 1, 100000),
+        "limit": _int_param(q.get("limit"), 50, 10, 100),
     }
 
 
@@ -429,6 +502,7 @@ async def login(request: Request):
         samesite="lax",
         max_age=7 * 24 * 3600,
         path="/",
+        secure=cookie_secure(request),
     )
     return response
 
@@ -562,11 +636,14 @@ def export_consents_zip(request: Request, mashuk_admin: Optional[str] = Cookie(d
     buf = BytesIO()
     used = set()
     added = 0
+    missing = []
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
         for row in rows:
+            stored = row.get("consent_path") or ""
             try:
-                path = find_upload(row.get("consent_path") or "")
+                path = find_upload(stored)
             except HTTPException:
+                missing.append("%s\t%s" % (row.get("id"), Path(str(stored)).name))
                 continue
             name = unique_name(
                 download_name(row, "consent", path.suffix.lower() or ".pdf"),
@@ -574,13 +651,26 @@ def export_consents_zip(request: Request, mashuk_admin: Optional[str] = Cookie(d
             )
             zf.write(path, name)
             added += 1
-    if not added:
-        raise HTTPException(404, "no consent files")
+        if missing:
+            zf.writestr("missing.txt", "id\tfile\n" + "\n".join(missing) + "\n")
+        if added == 0:
+            zf.writestr(
+                "README.txt",
+                (
+                    "\u0424\u0430\u0439\u043b\u044b \u0441\u043e\u0433\u043b\u0430\u0441\u0438\u0439 "
+                    "\u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u044b \u043d\u0430 \u0434\u0438\u0441\u043a\u0435 "
+                    "\u0441\u0435\u0440\u0432\u0435\u0440\u0430.\n"
+                    "\u041e\u043d\u0438 \u043c\u043e\u0433\u043b\u0438 \u043f\u0440\u043e\u043f\u0430\u0441\u0442\u044c "
+                    "\u043f\u043e\u0441\u043b\u0435 \u0434\u0435\u043f\u043b\u043e\u044f \u0431\u0435\u0437 "
+                    "\u043f\u043e\u0441\u0442\u043e\u044f\u043d\u043d\u043e\u0433\u043e \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0430.\n"
+                ),
+            )
     return Response(
         content=buf.getvalue(),
         media_type="application/zip",
         headers={
-            "Content-Disposition": 'attachment; filename="mashuk_soglasia.zip"'
+            "Content-Disposition": 'attachment; filename="mashuk_soglasia.zip"',
+            "Cache-Control": "no-store",
         },
     )
 
@@ -672,7 +762,10 @@ def _xlsx(rows, columns, sheet_name, filename, link_keys=()):
     return Response(
         content=buf.getvalue(),
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": "no-store",
+        },
     )
 
 

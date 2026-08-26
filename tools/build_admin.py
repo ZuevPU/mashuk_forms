@@ -63,6 +63,7 @@ T = {
     "portfolio": "\u041f\u043e\u0440\u0442\u0444\u043e\u043b\u0438\u043e",
     "consent": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435",
     "no_file": "\u041d\u0435\u0442 \u0444\u0430\u0439\u043b\u0430",
+    "err_file": "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0441\u043a\u0430\u0447\u0430\u0442\u044c \u0444\u0430\u0439\u043b. \u0415\u0433\u043e \u043d\u0435\u0442 \u043d\u0430 \u0441\u0435\u0440\u0432\u0435\u0440\u0435 \u0438\u043b\u0438 \u0441\u0435\u0441\u0441\u0438\u044f \u0438\u0441\u0442\u0435\u043a\u043b\u0430.",
     "prev": "\u041d\u0430\u0437\u0430\u0434",
     "next": "\u0414\u0430\u043b\u0435\u0435",
     "of": "\u0438\u0437",
@@ -446,6 +447,39 @@ html = f"""<!DOCTYPE html>
       return ({{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}})[c];
     }});
   }}
+  function filenameFrom(r, fallback){{
+    var cd = r.headers.get("content-disposition") || "";
+    var star = /filename\\*=UTF-8''([^;]+)/i.exec(cd);
+    if (star) {{
+      try {{ return decodeURIComponent(star[1]); }} catch (e) {{}}
+    }}
+    var plain = /filename="([^"]+)"/i.exec(cd);
+    if (plain) return plain[1];
+    return fallback;
+  }}
+  function saveBlob(url, fallbackName){{
+    return fetch(url, {{credentials:"include"}}).then(function(r){{
+      var ct = (r.headers.get("content-type") || "").toLowerCase();
+      if (!r.ok || ct.indexOf("json") >= 0 || ct.indexOf("text/html") >= 0) {{
+        return r.text().then(function(t){{
+          var msg = T.err_file;
+          try {{
+            var j = JSON.parse(t);
+            if (j && j.detail) msg = typeof j.detail === "string" ? j.detail : T.err_file;
+          }} catch (e) {{}}
+          alert(msg);
+        }});
+      }}
+      return r.blob().then(function(blob){{
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = filenameFrom(r, fallbackName);
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function(){{ URL.revokeObjectURL(a.href); a.remove(); }}, 1500);
+      }});
+    }}).catch(function(){{ alert(T.err_file); }});
+  }}
   function openCard(id){{
     var url = isInfo() ? "/admin/api/participants/" : "/admin/api/applications/";
     api(url + id).then(function(it){{
@@ -459,9 +493,9 @@ html = f"""<!DOCTYPE html>
       }});
       if (!isInfo()) {{
         html += '<div class="kv"><b>' + T.files + "</b><span>";
-        if (it.has_portfolio) html += '<a class="btn btn-navy" href="' + (it.portfolio_url || ("/admin/api/applications/" + id + "/file/portfolio")) + '" download>' + T.dl_portfolio + "</a> ";
+        if (it.has_portfolio) html += '<button class="btn btn-navy" type="button" data-dl="/admin/api/applications/' + id + '/file/portfolio" data-name="portfolio.pdf">' + T.dl_portfolio + "</button> ";
         else html += T.portfolio + ": " + T.no_file + "<br>";
-        if (it.has_consent) html += '<a class="btn btn-navy" href="' + (it.consent_url || ("/admin/api/applications/" + id + "/file/consent")) + '" download>' + T.dl_consent + "</a>";
+        if (it.has_consent) html += '<button class="btn btn-navy" type="button" data-dl="/admin/api/applications/' + id + '/file/consent" data-name="consent.pdf">' + T.dl_consent + "</button>";
         else html += T.consent + ": " + T.no_file;
         html += "</span></div>";
       }}
@@ -496,11 +530,17 @@ html = f"""<!DOCTYPE html>
   }};
   document.getElementById("excel-btn").onclick = function(){{
     var path = isInfo() ? "/admin/api/participants/export.xlsx?" : "/admin/api/applications/export.xlsx?";
-    window.location.href = path + qs();
+    var name = isInfo() ? "mashuk_uchastniki.xlsx" : "mashuk_zayavki.xlsx";
+    saveBlob(path + qs(), name);
   }};
   document.getElementById("consents-btn").onclick = function(){{
-    window.location.href = "/admin/api/consents.zip?" + qs();
+    saveBlob("/admin/api/consents.zip?" + qs(), "mashuk_soglasia.zip");
   }};
+  document.getElementById("card-body").addEventListener("click", function(e){{
+    var b = e.target.closest("[data-dl]");
+    if (!b) return;
+    saveBlob(b.getAttribute("data-dl"), b.getAttribute("data-name") || "file");
+  }});
   document.getElementById("form-apply").onclick = function(){{ setForm("apply"); }};
   document.getElementById("form-info").onclick = function(){{ setForm("info"); }};
   ["f-stream","f-country","f-gender","f-from","f-to"].forEach(function(id){{

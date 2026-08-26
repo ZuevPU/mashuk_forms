@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from admin_api import router as admin_router
+from admin_api import primary_upload_dir, router as admin_router
 
 load_dotenv()
 
@@ -41,7 +41,7 @@ ROOT = Path(__file__).resolve().parent
 DATABASE_URL = normalize_database_url(os.environ.get("DATABASE_URL", ""))
 if DATABASE_URL:
     os.environ["DATABASE_URL"] = DATABASE_URL
-UPLOAD_DIR = Path(os.environ.get("UPLOAD_DIR", str(ROOT / "uploads"))).resolve()
+UPLOAD_DIR = primary_upload_dir()
 MAX_FILE_MB = int(os.environ.get("MAX_FILE_MB", "20"))
 MAX_BYTES = MAX_FILE_MB * 1024 * 1024
 FRAME_ANCESTORS = os.environ.get(
@@ -131,6 +131,7 @@ def on_startup():
         init_schema()
     except Exception:
         log.exception("schema init failed")
+    log.info("uploads dir %s exists=%s", UPLOAD_DIR, UPLOAD_DIR.is_dir())
 
 
 def save_upload(kind: str, upload: UploadFile, allowed: set[str]) -> str:
