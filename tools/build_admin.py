@@ -196,6 +196,7 @@ tr.row:hover{background:rgba(34,63,154,.04)}
 .kv b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
 .kv span{white-space:pre-wrap;font-weight:300;line-height:1.5}
 .drawer .btn{display:inline-flex;align-items:center;margin:8px 8px 0 0;text-decoration:none}
+.hidden{display:none!important}
 @media(max-width:960px){.filters{grid-template-columns:1fr 1fr}}
 """
 
