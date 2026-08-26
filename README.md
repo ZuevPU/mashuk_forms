@@ -40,28 +40,24 @@ deploy/             nginx, systemd, Timeweb start
 
 ## Timeweb + GitHub
 
-1. В Timeweb Apps подключите этот репозиторий (main).
-2. Корень приложения — корень репозитория.
-3. `pip install -r requirements.txt`
-4. Стартовая команда:
+1. Backend → FastAPI, репо `ZuevPU/mashuk_forms`, ветка `main`.
+2. **Путь до директории проекта — пусто.** Не писать `/health`.
+3. **Путь проверки состояния:** `/health` (это URL, не папка).
+4. Команда сборки:
 
 ```
-gunicorn -w 2 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 app:app
+pip3 install --upgrade -r /app/requirements.txt
 ```
 
-`sh deploy/start.sh`
+5. Команда запуска:
 
-5. Переменные окружения только в панели Timeweb:
+```
+uvicorn main:app --host 0.0.0.0 --port 80
+```
 
-- `DATABASE_URL`
-- `ADMIN_PASSWORD`
-- `ADMIN_SECRET`
-- `UPLOAD_DIR=./uploads`
-- `MAX_FILE_MB=20`
-- `CORS_ORIGINS`
-- `FRAME_ANCESTORS` — `https://*.tilda.ws https://*.tilda.cc`
+6. Переменные только в панели Timeweb: `DATABASE_URL`, `ADMIN_PASSWORD`, `ADMIN_SECRET`, `UPLOAD_DIR=./uploads`, `MAX_FILE_MB=20`, `CORS_ORIGINS`, `FRAME_ANCESTORS`.
 
-6. В Тильде, блок HTML (T123), код из `tilda/tilda-iframe-block.html`
+7. В Тильде, блок HTML (T123), код из `tilda/tilda-iframe-block.html`.
 
 Админку в iframe не встраивать.
 
