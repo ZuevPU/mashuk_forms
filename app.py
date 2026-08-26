@@ -3,6 +3,7 @@ import logging
 import os
 import uuid
 from pathlib import Path
+from urllib.parse import urlparse
 
 import psycopg
 from psycopg.types.json import Json
@@ -26,18 +27,45 @@ MAX_FILE_MB = int(os.environ.get("MAX_FILE_MB", "20"))
 MAX_BYTES = MAX_FILE_MB * 1024 * 1024
 FRAME_ANCESTORS = os.environ.get(
     "FRAME_ANCESTORS",
-    "http://127.0.0.1:8000 http://localhost:8000 https://*.tilda.ws https://*.tilda.cc",
+    "http://127.0.0.1:8000 http://localhost:8000 https://*.tilda.ws https://*.tilda.cc https://mashuk.online https://www.mashuk.online",
 )
 CORS_ORIGINS = [
     o.strip()
     for o in os.environ.get(
         "CORS_ORIGINS",
-        "http://127.0.0.1:8000,http://localhost:8000",
+        "http://127.0.0.1:8000,http://localhost:8000,https://mashuk.online,https://www.mashuk.online",
     ).split(",")
     if o.strip()
 ]
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+ALWAYS_FRAME_ANCESTORS = [
+    "https://*.tilda.ws",
+    "https://*.tilda.cc",
+    "https://mashuk.online",
+    "https://www.mashuk.online",
+]
+
+
+def frame_ancestor_origin(token: str) -> str:
+    token = token.strip().strip("'\"")
+    if not token or token in ("self", "'self'"):
+        return ""
+    raw = token if "://" in token else "https://" + token
+    parsed = urlparse(raw)
+    if parsed.scheme not in ("http", "https") or not parsed.netloc:
+        return ""
+    return parsed.scheme + "://" + parsed.netloc
+
+
+def frame_ancestors_header() -> str:
+    origins = []
+    for token in ALWAYS_FRAME_ANCESTORS + FRAME_ANCESTORS.split():
+        origin = frame_ancestor_origin(token)
+        if origin and origin not in origins:
+            origins.append(origin)
+    return "frame-ancestors 'self' " + " ".join(origins)
 
 
 class FrameAncestorsMiddleware(BaseHTTPMiddleware):
@@ -46,9 +74,7 @@ class FrameAncestorsMiddleware(BaseHTTPMiddleware):
         if request.url.path.startswith("/admin"):
             response.headers["Content-Security-Policy"] = "frame-ancestors 'self'"
         else:
-            response.headers["Content-Security-Policy"] = (
-                "frame-ancestors 'self' " + FRAME_ANCESTORS
-            )
+            response.headers["Content-Security-Policy"] = frame_ancestors_header()
         if "x-frame-options" in response.headers:
             del response.headers["x-frame-options"]
         return response
