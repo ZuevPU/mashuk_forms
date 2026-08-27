@@ -124,6 +124,8 @@ tr.row:hover{background:rgba(34,63,154,.04)}
   var LABELS = {"id": "ID", "created_at": "\u0414\u0430\u0442\u0430", "program": "\u041f\u0440\u043e\u0433\u0440\u0430\u043c\u043c\u0430", "fio_latin": "\u0424\u0418\u041e (passport)", "fio_ru": "\u0424\u0418\u041e \u0440\u0443\u0441.", "birth_date": "\u0414\u0430\u0442\u0430 \u0440\u043e\u0436\u0434\u0435\u043d\u0438\u044f", "gender": "\u041f\u043e\u043b", "country": "\u0421\u0442\u0440\u0430\u043d\u0430", "city": "\u0413\u043e\u0440\u043e\u0434", "arrival": "\u041e\u0442\u043a\u0443\u0434\u0430 \u043f\u0440\u0438\u0431\u044b\u0432\u0430\u0435\u0442", "citizenship": "\u0413\u0440\u0430\u0436\u0434\u0430\u043d\u0441\u0442\u0432\u043e", "all_citizenships": "\u0412\u0441\u0435 \u0433\u0440\u0430\u0436\u0434\u0430\u043d\u0441\u0442\u0432\u0430", "phone": "\u0422\u0435\u043b\u0435\u0444\u043e\u043d", "email": "E-mail", "messenger": "\u041c\u0435\u0441\u0441\u0435\u043d\u0434\u0436\u0435\u0440", "messenger_link": "\u0421\u0441\u044b\u043b\u043a\u0430 \u043c\u0435\u0441\u0441\u0435\u043d\u0434\u0436\u0435\u0440\u0430", "messenger_other": "\u0414\u0440\u0443\u0433\u043e\u0439 \u043c\u0435\u0441\u0441\u0435\u043d\u0434\u0436\u0435\u0440", "org_name": "\u041e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u044f", "org_spec": "\u0421\u043f\u0435\u0446\u0438\u0430\u043b\u0438\u0437\u0430\u0446\u0438\u044f", "org_location": "\u0421\u0442\u0440\u0430\u043d\u0430 \u0438 \u0433\u043e\u0440\u043e\u0434 \u043e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u0438", "position": "\u0414\u043e\u043b\u0436\u043d\u043e\u0441\u0442\u044c", "audience": "\u0410\u0443\u0434\u0438\u0442\u043e\u0440\u0438\u044f", "audience_other": "\u0410\u0443\u0434\u0438\u0442\u043e\u0440\u0438\u044f (\u0434\u0440\u0443\u0433\u043e\u0435)", "stream": "\u041f\u043e\u0442\u043e\u043a", "how_learned": "\u041e\u0442\u043a\u0443\u0434\u0430 \u0443\u0437\u043d\u0430\u043b", "intl_programs": "\u041c\u0435\u0436\u0434\u0443\u043d\u0430\u0440\u043e\u0434\u043d\u044b\u0435 \u043f\u0440\u043e\u0433\u0440\u0430\u043c\u043c\u044b", "intl_details": "\u0414\u0435\u0442\u0430\u043b\u0438 \u043c\u0435\u0436\u0434\u0443\u043d\u0430\u0440\u043e\u0434\u043d\u044b\u0445 \u043f\u0440\u043e\u0433\u0440\u0430\u043c\u043c", "ru_programs": "\u0420\u043e\u0441\u0441\u0438\u0439\u0441\u043a\u0438\u0435 \u043f\u0440\u043e\u0433\u0440\u0430\u043c\u043c\u044b", "ru_details": "\u0414\u0435\u0442\u0430\u043b\u0438 \u0440\u043e\u0441\u0441\u0438\u0439\u0441\u043a\u0438\u0445 \u043f\u0440\u043e\u0433\u0440\u0430\u043c\u043c", "why": "\u041f\u043e\u0447\u0435\u043c\u0443 \u0432\u0430\u0436\u043d\u043e \u0443\u0447\u0430\u0441\u0442\u0438\u0435", "coop": "\u041f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u043f\u043e \u0441\u043e\u0442\u0440\u0443\u0434\u043d\u0438\u0447\u0435\u0441\u0442\u0432\u0443", "mentor": "\u041d\u0430\u0441\u0442\u0430\u0432\u043d\u0438\u043a", "directions": "\u041d\u0430\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u044f", "directions_other": "\u041d\u0430\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435 (\u0434\u0440\u0443\u0433\u043e\u0435)", "address": "\u0410\u0434\u0440\u0435\u0441 \u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u0438", "passport_series": "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u0441\u0435\u0440\u0438\u044f", "passport_number": "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u043d\u043e\u043c\u0435\u0440", "passport_date": "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u0434\u0430\u0442\u0430", "passport_issued": "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d"};
   var LABELS_INFO = {"id": "ID", "created_at": "\u0414\u0430\u0442\u0430", "fio_latin": "\u0424\u0418\u041e", "health_limits": "\u041e\u0433\u0440\u0430\u043d\u0438\u0447\u0435\u043d\u0438\u044f \u043f\u043e \u0437\u0434\u043e\u0440\u043e\u0432\u044c\u044e", "meal_type": "\u041f\u0438\u0442\u0430\u043d\u0438\u0435", "id_doc_type": "\u0422\u0438\u043f \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430", "id_doc_series": "\u0421\u0435\u0440\u0438\u044f \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430", "id_doc_number": "\u041d\u043e\u043c\u0435\u0440 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430", "id_doc_issued": "\u0414\u0430\u0442\u0430 \u0432\u044b\u0434\u0430\u0447\u0438", "id_doc_valid_from": "\u0421\u0440\u043e\u043a \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044f \u0441", "id_doc_valid_to": "\u0421\u0440\u043e\u043a \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044f \u043f\u043e", "id_doc_issuer": "\u041a\u0435\u043c \u0432\u044b\u0434\u0430\u043d", "entry_doc_name": "\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442 \u0434\u043b\u044f \u0432\u044a\u0435\u0437\u0434\u0430 \u0432 \u0420\u0424", "entry_doc_series": "\u0412\u044a\u0435\u0437\u0434: \u0441\u0435\u0440\u0438\u044f", "entry_doc_number": "\u0412\u044a\u0435\u0437\u0434: \u043d\u043e\u043c\u0435\u0440", "entry_doc_issued": "\u0412\u044a\u0435\u0437\u0434: \u0434\u0430\u0442\u0430 \u0432\u044b\u0434\u0430\u0447\u0438", "entry_doc_valid_from": "\u0412\u044a\u0435\u0437\u0434: \u0441\u0440\u043e\u043a \u0441", "entry_doc_valid_to": "\u0412\u044a\u0435\u0437\u0434: \u0441\u0440\u043e\u043a \u043f\u043e", "entry_doc_issuer": "\u0412\u044a\u0435\u0437\u0434: \u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d", "stream": "\u041f\u043e\u0442\u043e\u043a", "depart_country": "\u0421\u0442\u0440\u0430\u043d\u0430 \u043e\u0442\u044a\u0435\u0437\u0434\u0430", "depart_city": "\u0413\u043e\u0440\u043e\u0434 \u043e\u0442\u044a\u0435\u0437\u0434\u0430", "return_ticket": "\u041e\u0431\u0440\u0430\u0442\u043d\u044b\u0439 \u0431\u0438\u043b\u0435\u0442", "baggage": "\u0411\u0430\u0433\u0430\u0436", "visa_needed": "\u0412\u0438\u0437\u0430 \u0432 \u0420\u0424", "transit_visa": "\u0422\u0440\u0430\u043d\u0437\u0438\u0442\u043d\u0430\u044f \u0432\u0438\u0437\u0430", "agree_tickets": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0431\u0438\u043b\u0435\u0442\u044b \u0431\u0435\u0437 \u0432\u043e\u0437\u0432\u0440\u0430\u0442\u0430", "agree_notice": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u0435 \u0437\u0430 10 \u0434\u043d\u0435\u0439", "agree_truth": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0434\u043e\u0441\u0442\u043e\u0432\u0435\u0440\u043d\u043e\u0441\u0442\u044c", "agree_extra_docs": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0434\u043e\u043f. \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u044b", "agree_refusal": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u043e\u0442\u043a\u0430\u0437 \u043f\u0440\u0438 \u0442\u0440\u0443\u0434\u043d\u043e\u0441\u0442\u044f\u0445 \u0432\u044a\u0435\u0437\u0434\u0430"};
   var state = { page:1, sort:"created_at", order:"desc", form:"apply" };
+  var loadSeq = 0;
+  var ignoreFilterChange = false;
   var loginView = document.getElementById("login-view");
   var appView = document.getElementById("app-view");
   function qs(){
@@ -176,8 +178,20 @@ tr.row:hover{background:rgba(34,63,154,.04)}
     loginView.classList.remove("hidden");
   }
   function isInfo(){ return state.form === "info"; }
+  function clearFilters(){
+    ignoreFilterChange = true;
+    document.getElementById("f-q").value = "";
+    document.getElementById("f-stream").value = "";
+    document.getElementById("f-country").value = "";
+    document.getElementById("f-gender").value = "";
+    document.getElementById("f-from").value = "";
+    document.getElementById("f-to").value = "";
+    ignoreFilterChange = false;
+  }
   function setForm(form, skipReset){
-    state.form = form === "info" ? "info" : "apply";
+    var next = form === "info" ? "info" : "apply";
+    if (!skipReset && next === state.form) return;
+    state.form = next;
     try { sessionStorage.setItem("mshk-admin-form", state.form); } catch (e) {}
     document.getElementById("form-apply").className = "btn " + (isInfo() ? "btn-off" : "btn-on");
     document.getElementById("form-info").className = "btn " + (isInfo() ? "btn-on" : "btn-off");
@@ -189,10 +203,14 @@ tr.row:hover{background:rgba(34,63,154,.04)}
       state.page = 1;
       state.sort = "created_at";
       state.order = "desc";
+      clearFilters();
+      closeCard();
     }
     renderHead();
-    loadMeta();
-    loadList();
+    document.getElementById("tbody").innerHTML = "";
+    loadSeq += 1;
+    loadMeta(loadSeq);
+    loadList(loadSeq);
   }
   function renderHead(){
     var head = document.getElementById("thead");
@@ -206,16 +224,20 @@ tr.row:hover{background:rgba(34,63,154,.04)}
     html += "</tr>";
     head.innerHTML = html;
   }
-  function loadMeta(){
-    api("/admin/api/meta?form=" + state.form).then(function(m){
+  function loadMeta(seq){
+    var form = state.form;
+    seq = seq || loadSeq;
+    api("/admin/api/meta?form=" + form).then(function(m){
+      if (seq !== loadSeq || state.form !== form) return;
       fillSelect("f-stream", m.streams, T.stream);
       fillSelect("f-country", m.countries, T.country);
-      if (!isInfo()) fillSelect("f-gender", m.genders, T.gender);
+      if (form !== "info") fillSelect("f-gender", m.genders, T.gender);
     }).catch(function(){});
   }
   function fillSelect(id, items, label){
     var el = document.getElementById(id);
     var cur = el.value;
+    ignoreFilterChange = true;
     el.innerHTML = "";
     var o0 = document.createElement("option");
     o0.value = ""; o0.textContent = label + ": " + T.all;
@@ -225,8 +247,13 @@ tr.row:hover{background:rgba(34,63,154,.04)}
       o.value = v; o.textContent = v; el.appendChild(o);
     });
     el.value = cur;
+    if (el.value !== cur) el.value = "";
+    ignoreFilterChange = false;
   }
-  function loadList(){
+  function loadList(seq){
+    seq = seq || loadSeq;
+    var form = state.form;
+    var info = form === "info";
     document.querySelectorAll("th[data-sort]").forEach(function(th){
       var key = th.getAttribute("data-sort");
       var base = th.getAttribute("data-label") || th.textContent.replace(/ [\u25B2\u25BC]$/, "");
@@ -235,24 +262,25 @@ tr.row:hover{background:rgba(34,63,154,.04)}
       if (state.sort === key) mark = state.order === "asc" ? " \u25B2" : " \u25BC";
       th.textContent = base + mark;
     });
-    var url = isInfo() ? "/admin/api/participants?" : "/admin/api/applications?";
+    var url = info ? "/admin/api/participants?" : "/admin/api/applications?";
     api(url + qs()).then(function(data){
+      if (seq !== loadSeq || state.form !== form) return;
       var tb = document.getElementById("tbody");
       tb.innerHTML = "";
-      document.getElementById("count-line").textContent = (data.total || 0) + " " + (isInfo() ? T.count_info : T.count);
+      document.getElementById("count-line").textContent = (data.total || 0) + " " + (info ? T.count_info : T.count);
       document.getElementById("page-line").textContent = data.page + " / " + data.pages;
       document.getElementById("prev-btn").disabled = data.page <= 1;
       document.getElementById("next-btn").disabled = data.page >= data.pages;
       if (!data.items.length){
         var tr = document.createElement("tr");
-        tr.innerHTML = '<td colspan="8">' + (isInfo() ? T.empty_info : T.empty) + "</td>";
+        tr.innerHTML = '<td colspan="8">' + (info ? T.empty_info : T.empty) + "</td>";
         tb.appendChild(tr);
         return;
       }
       data.items.forEach(function(it){
         var tr = document.createElement("tr");
         tr.className = "row";
-        if (isInfo()) {
+        if (info) {
           tr.innerHTML =
             "<td>" + it.id + "</td>" +
             "<td>" + fmtDate(it.created_at) + "</td>" +
@@ -277,6 +305,7 @@ tr.row:hover{background:rgba(34,63,154,.04)}
         tb.appendChild(tr);
       });
     }).catch(function(e){
+      if (seq !== loadSeq) return;
       if (e.message === "auth") showLogin();
     });
   }
@@ -319,17 +348,19 @@ tr.row:hover{background:rgba(34,63,154,.04)}
     }).catch(function(){ alert(T.err_file); });
   }
   function openCard(id){
-    var url = isInfo() ? "/admin/api/participants/" : "/admin/api/applications/";
+    var form = state.form;
+    var url = form === "info" ? "/admin/api/participants/" : "/admin/api/applications/";
     api(url + id).then(function(it){
+      if (state.form !== form) return;
       document.getElementById("card-title").textContent = it.fio_latin || ("#" + it.id);
-      var labels = isInfo() ? LABELS_INFO : LABELS;
+      var labels = form === "info" ? LABELS_INFO : LABELS;
       var skip = {payload_raw:1, has_portfolio:1, has_consent:1, portfolio_url:1, consent_url:1};
       var html = "";
       Object.keys(labels).forEach(function(k){
         if (skip[k]) return;
         html += '<div class="kv"><b>' + esc(labels[k]) + "</b><span>" + esc(fmtVal(it[k])) + "</span></div>";
       });
-      if (!isInfo()) {
+      if (form !== "info") {
         html += '<div class="kv"><b>' + T.files + "</b><span>";
         if (it.has_portfolio) html += '<button class="btn btn-navy" type="button" data-dl="/admin/api/applications/' + id + '/file/portfolio" data-name="portfolio.pdf">' + T.dl_portfolio + "</button> ";
         else html += T.portfolio + ": " + T.no_file + "<br>";
@@ -382,7 +413,11 @@ tr.row:hover{background:rgba(34,63,154,.04)}
   document.getElementById("form-apply").onclick = function(){ setForm("apply"); };
   document.getElementById("form-info").onclick = function(){ setForm("info"); };
   ["f-stream","f-country","f-gender","f-from","f-to"].forEach(function(id){
-    document.getElementById(id).addEventListener("change", function(){ state.page = 1; loadList(); });
+    document.getElementById(id).addEventListener("change", function(){
+      if (ignoreFilterChange) return;
+      state.page = 1;
+      loadList();
+    });
   });
   var qTimer = null;
   document.getElementById("f-q").addEventListener("input", function(){

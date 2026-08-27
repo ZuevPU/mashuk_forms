@@ -286,6 +286,8 @@ html = f"""<!DOCTYPE html>
   var LABELS = {JS_LABELS};
   var LABELS_INFO = {JS_LABELS_INFO};
   var state = {{ page:1, sort:"created_at", order:"desc", form:"apply" }};
+  var loadSeq = 0;
+  var ignoreFilterChange = false;
   var loginView = document.getElementById("login-view");
   var appView = document.getElementById("app-view");
   function qs(){{
@@ -338,8 +340,20 @@ html = f"""<!DOCTYPE html>
     loginView.classList.remove("hidden");
   }}
   function isInfo(){{ return state.form === "info"; }}
+  function clearFilters(){{
+    ignoreFilterChange = true;
+    document.getElementById("f-q").value = "";
+    document.getElementById("f-stream").value = "";
+    document.getElementById("f-country").value = "";
+    document.getElementById("f-gender").value = "";
+    document.getElementById("f-from").value = "";
+    document.getElementById("f-to").value = "";
+    ignoreFilterChange = false;
+  }}
   function setForm(form, skipReset){{
-    state.form = form === "info" ? "info" : "apply";
+    var next = form === "info" ? "info" : "apply";
+    if (!skipReset && next === state.form) return;
+    state.form = next;
     try {{ sessionStorage.setItem("mshk-admin-form", state.form); }} catch (e) {{}}
     document.getElementById("form-apply").className = "btn " + (isInfo() ? "btn-off" : "btn-on");
     document.getElementById("form-info").className = "btn " + (isInfo() ? "btn-on" : "btn-off");
@@ -351,10 +365,14 @@ html = f"""<!DOCTYPE html>
       state.page = 1;
       state.sort = "created_at";
       state.order = "desc";
+      clearFilters();
+      closeCard();
     }}
     renderHead();
-    loadMeta();
-    loadList();
+    document.getElementById("tbody").innerHTML = "";
+    loadSeq += 1;
+    loadMeta(loadSeq);
+    loadList(loadSeq);
   }}
   function renderHead(){{
     var head = document.getElementById("thead");
@@ -368,16 +386,20 @@ html = f"""<!DOCTYPE html>
     html += "</tr>";
     head.innerHTML = html;
   }}
-  function loadMeta(){{
-    api("/admin/api/meta?form=" + state.form).then(function(m){{
+  function loadMeta(seq){{
+    var form = state.form;
+    seq = seq || loadSeq;
+    api("/admin/api/meta?form=" + form).then(function(m){{
+      if (seq !== loadSeq || state.form !== form) return;
       fillSelect("f-stream", m.streams, T.stream);
       fillSelect("f-country", m.countries, T.country);
-      if (!isInfo()) fillSelect("f-gender", m.genders, T.gender);
+      if (form !== "info") fillSelect("f-gender", m.genders, T.gender);
     }}).catch(function(){{}});
   }}
   function fillSelect(id, items, label){{
     var el = document.getElementById(id);
     var cur = el.value;
+    ignoreFilterChange = true;
     el.innerHTML = "";
     var o0 = document.createElement("option");
     o0.value = ""; o0.textContent = label + ": " + T.all;
@@ -387,8 +409,13 @@ html = f"""<!DOCTYPE html>
       o.value = v; o.textContent = v; el.appendChild(o);
     }});
     el.value = cur;
+    if (el.value !== cur) el.value = "";
+    ignoreFilterChange = false;
   }}
-  function loadList(){{
+  function loadList(seq){{
+    seq = seq || loadSeq;
+    var form = state.form;
+    var info = form === "info";
     document.querySelectorAll("th[data-sort]").forEach(function(th){{
       var key = th.getAttribute("data-sort");
       var base = th.getAttribute("data-label") || th.textContent.replace(/ [\\u25B2\\u25BC]$/, "");
@@ -397,24 +424,25 @@ html = f"""<!DOCTYPE html>
       if (state.sort === key) mark = state.order === "asc" ? " \\u25B2" : " \\u25BC";
       th.textContent = base + mark;
     }});
-    var url = isInfo() ? "/admin/api/participants?" : "/admin/api/applications?";
+    var url = info ? "/admin/api/participants?" : "/admin/api/applications?";
     api(url + qs()).then(function(data){{
+      if (seq !== loadSeq || state.form !== form) return;
       var tb = document.getElementById("tbody");
       tb.innerHTML = "";
-      document.getElementById("count-line").textContent = (data.total || 0) + " " + (isInfo() ? T.count_info : T.count);
+      document.getElementById("count-line").textContent = (data.total || 0) + " " + (info ? T.count_info : T.count);
       document.getElementById("page-line").textContent = data.page + " / " + data.pages;
       document.getElementById("prev-btn").disabled = data.page <= 1;
       document.getElementById("next-btn").disabled = data.page >= data.pages;
       if (!data.items.length){{
         var tr = document.createElement("tr");
-        tr.innerHTML = '<td colspan="8">' + (isInfo() ? T.empty_info : T.empty) + "</td>";
+        tr.innerHTML = '<td colspan="8">' + (info ? T.empty_info : T.empty) + "</td>";
         tb.appendChild(tr);
         return;
       }}
       data.items.forEach(function(it){{
         var tr = document.createElement("tr");
         tr.className = "row";
-        if (isInfo()) {{
+        if (info) {{
           tr.innerHTML =
             "<td>" + it.id + "</td>" +
             "<td>" + fmtDate(it.created_at) + "</td>" +
@@ -439,6 +467,7 @@ html = f"""<!DOCTYPE html>
         tb.appendChild(tr);
       }});
     }}).catch(function(e){{
+      if (seq !== loadSeq) return;
       if (e.message === "auth") showLogin();
     }});
   }}
@@ -481,17 +510,19 @@ html = f"""<!DOCTYPE html>
     }}).catch(function(){{ alert(T.err_file); }});
   }}
   function openCard(id){{
-    var url = isInfo() ? "/admin/api/participants/" : "/admin/api/applications/";
+    var form = state.form;
+    var url = form === "info" ? "/admin/api/participants/" : "/admin/api/applications/";
     api(url + id).then(function(it){{
+      if (state.form !== form) return;
       document.getElementById("card-title").textContent = it.fio_latin || ("#" + it.id);
-      var labels = isInfo() ? LABELS_INFO : LABELS;
+      var labels = form === "info" ? LABELS_INFO : LABELS;
       var skip = {{payload_raw:1, has_portfolio:1, has_consent:1, portfolio_url:1, consent_url:1}};
       var html = "";
       Object.keys(labels).forEach(function(k){{
         if (skip[k]) return;
         html += '<div class="kv"><b>' + esc(labels[k]) + "</b><span>" + esc(fmtVal(it[k])) + "</span></div>";
       }});
-      if (!isInfo()) {{
+      if (form !== "info") {{
         html += '<div class="kv"><b>' + T.files + "</b><span>";
         if (it.has_portfolio) html += '<button class="btn btn-navy" type="button" data-dl="/admin/api/applications/' + id + '/file/portfolio" data-name="portfolio.pdf">' + T.dl_portfolio + "</button> ";
         else html += T.portfolio + ": " + T.no_file + "<br>";
@@ -544,7 +575,11 @@ html = f"""<!DOCTYPE html>
   document.getElementById("form-apply").onclick = function(){{ setForm("apply"); }};
   document.getElementById("form-info").onclick = function(){{ setForm("info"); }};
   ["f-stream","f-country","f-gender","f-from","f-to"].forEach(function(id){{
-    document.getElementById(id).addEventListener("change", function(){{ state.page = 1; loadList(); }});
+    document.getElementById(id).addEventListener("change", function(){{
+      if (ignoreFilterChange) return;
+      state.page = 1;
+      loadList();
+    }});
   }});
   var qTimer = null;
   document.getElementById("f-q").addEventListener("input", function(){{
