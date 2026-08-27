@@ -93,8 +93,9 @@ def field(name, label, hint="", typ="text", required=True, area=False):
     )
 
 
-def radios(name, label, options, hint=""):
+def radios(name, label, options, hint="", required=True):
     hid = ('<p class="mshk-apply__hint">' + eh(hint) + C("p")) if hint else ""
+    req = " required" if required else ""
     items = []
     for val, txt in options:
         items.append(
@@ -102,7 +103,9 @@ def radios(name, label, options, hint=""):
             + name
             + '" value="'
             + eh(val)
-            + '" required><span>'
+            + '"'
+            + req
+            + "><span>"
             + eh(txt)
             + C("span")
             + C("label")
@@ -224,7 +227,7 @@ JS = r"""
     if (!val(name)) { showErr(name, T.req); return false; }
     showErr(name, ""); return true;
   }
-  var DRAFT_KEY = "mshk-info-draft-v1";
+  var DRAFT_KEY = "mshk-info-draft-v6";
   var saveTimer = null;
   function collectDraft(){
     var o = {step: step, values: {}, checks: {}};
@@ -277,43 +280,96 @@ JS = r"""
       });
     });
     var n = parseInt(o.step, 10);
-    return (n >= 1 && n <= 4) ? n : 1;
+    return (n >= 1 && n <= 6) ? n : 1;
   }
-  var STEP1 = [
-    "fio_latin","health_limits","meal_type","id_doc_type","id_doc_series","id_doc_number",
-    "id_doc_issued","id_doc_valid_from","id_doc_valid_to","id_doc_issuer","entry_doc_name",
-    "entry_doc_series","entry_doc_number","entry_doc_issued","entry_doc_valid_from",
+  function syncOtherCit(){
+    var yes = "\u0414\u0430";
+    var box = $('[data-field="other_citizenships_detail"]');
+    if (box) box.style.display = val("other_citizenships")===yes ? "" : "none";
+  }
+  function syncIdOther(){
+    var other = "\u0414\u0440\u0443\u0433\u043e\u0435";
+    var box = $('[data-field="id_doc_type_other"]');
+    if (box) box.style.display = val("id_doc_type")===other ? "" : "none";
+  }
+  function syncVisaStatus(){
+    var no = "\u041d\u0435\u0442";
+    var box = $('[data-field="visa_status"]');
+    if (box) box.style.display = val("visa_current")===no ? "" : "none";
+  }
+  function syncHealth(){
+    var yes = "\u0414\u0430";
+    var other = "\u0414\u0440\u0443\u0433\u043e\u0435";
+    var a = $('[data-field="allergies_detail"]');
+    if (a) a.style.display = val("allergies")===yes ? "" : "none";
+    var h = $('[data-field="health_conditions_detail"]');
+    if (h) h.style.display = val("health_conditions")===yes ? "" : "none";
+    var m = $('[data-field="meal_type_other"]');
+    if (m) m.style.display = val("meal_type")===other ? "" : "none";
+  }
+  var STEP1 = ["fio_latin","gender","citizenship","other_citizenships"];
+  var STEP2 = [
+    "id_doc_type","id_doc_series","id_doc_number","id_doc_issued",
+    "id_doc_valid_to","id_doc_issuer","entry_doc_name",
+    "entry_doc_series","entry_doc_number","entry_doc_issued",
     "entry_doc_valid_to","entry_doc_issuer"
   ];
-  var STEP2 = ["stream","depart_country","depart_city","return_ticket","baggage"];
-  var STEP3 = ["visa_needed","transit_visa"];
-  var STEP4 = ["agree_tickets","agree_notice","agree_truth","agree_extra_docs","agree_refusal"];
+  var STEP3 = ["stream","depart_country","depart_city","return_ticket","baggage"];
+  var STEP4 = ["visa_needed","visa_current"];
+  var STEP5 = ["allergies","health_conditions","meal_type"];
+  var STEP6 = ["agree_participate","agree_notice","agree_truth","agree_extra_docs","agree_refusal","agree_logistics_city","agree_logistics_change","agree_logistics_fixed"];
   function validStep(n){
     var ok = true;
     function req(name){ if (!need(name)) ok = false; }
-    if (n===1) STEP1.forEach(req);
-    if (n===2) STEP2.forEach(req);
+    if (n===1) {
+      STEP1.forEach(req);
+      if (val("other_citizenships")==="\u0414\u0430") req("other_citizenships_detail");
+    }
+    if (n===2) {
+      STEP2.forEach(req);
+      if (val("id_doc_type")==="\u0414\u0440\u0443\u0433\u043e\u0435") req("id_doc_type_other");
+    }
     if (n===3) STEP3.forEach(req);
-    if (n===4) STEP4.forEach(req);
+    if (n===4) {
+      STEP4.forEach(req);
+      if (val("visa_current")==="\u041d\u0435\u0442") req("visa_status");
+    }
+    if (n===5) {
+      STEP5.forEach(req);
+      if (val("allergies")==="\u0414\u0430") req("allergies_detail");
+      if (val("health_conditions")==="\u0414\u0430") req("health_conditions_detail");
+      if (val("meal_type")==="\u0414\u0440\u0443\u0433\u043e\u0435") req("meal_type_other");
+    }
+    if (n===6) STEP6.forEach(req);
     return ok;
   }
   function payload(){
     return {
       fio_latin: val("fio_latin"),
-      health_limits: val("health_limits"),
+      gender: val("gender"),
+      citizenship: val("citizenship"),
+      other_citizenships: val("other_citizenships"),
+      other_citizenships_detail: val("other_citizenships")==="\u0414\u0430" ? val("other_citizenships_detail") : "",
+      health_limits: val("health_conditions")==="\u0414\u0430" ? val("health_conditions_detail") : val("health_conditions"),
+      allergies: val("allergies"),
+      allergies_detail: val("allergies")==="\u0414\u0430" ? val("allergies_detail") : "",
+      health_conditions: val("health_conditions"),
+      health_conditions_detail: val("health_conditions")==="\u0414\u0430" ? val("health_conditions_detail") : "",
       meal_type: val("meal_type"),
+      meal_type_other: val("meal_type")==="\u0414\u0440\u0443\u0433\u043e\u0435" ? val("meal_type_other") : "",
       id_doc_type: val("id_doc_type"),
+      id_doc_type_other: val("id_doc_type")==="\u0414\u0440\u0443\u0433\u043e\u0435" ? val("id_doc_type_other") : "",
       id_doc_series: val("id_doc_series"),
       id_doc_number: val("id_doc_number"),
       id_doc_issued: val("id_doc_issued"),
-      id_doc_valid_from: val("id_doc_valid_from"),
+      id_doc_valid_from: "",
       id_doc_valid_to: val("id_doc_valid_to"),
       id_doc_issuer: val("id_doc_issuer"),
       entry_doc_name: val("entry_doc_name"),
       entry_doc_series: val("entry_doc_series"),
       entry_doc_number: val("entry_doc_number"),
       entry_doc_issued: val("entry_doc_issued"),
-      entry_doc_valid_from: val("entry_doc_valid_from"),
+      entry_doc_valid_from: "",
       entry_doc_valid_to: val("entry_doc_valid_to"),
       entry_doc_issuer: val("entry_doc_issuer"),
       stream: val("stream"),
@@ -322,16 +378,22 @@ JS = r"""
       return_ticket: val("return_ticket"),
       baggage: val("baggage"),
       visa_needed: val("visa_needed"),
-      transit_visa: val("transit_visa"),
-      agree_tickets: !!$("#agree_tickets") && $("#agree_tickets").checked,
+      visa_current: val("visa_current"),
+      visa_status: val("visa_current")==="\u041d\u0435\u0442" ? val("visa_status") : "",
+      transit_visa: "",
+      agree_tickets: false,
+      agree_participate: !!$("#agree_participate") && $("#agree_participate").checked,
       agree_notice: !!$("#agree_notice") && $("#agree_notice").checked,
       agree_truth: !!$("#agree_truth") && $("#agree_truth").checked,
       agree_extra_docs: !!$("#agree_extra_docs") && $("#agree_extra_docs").checked,
-      agree_refusal: !!$("#agree_refusal") && $("#agree_refusal").checked
+      agree_refusal: !!$("#agree_refusal") && $("#agree_refusal").checked,
+      agree_logistics_city: !!$("#agree_logistics_city") && $("#agree_logistics_city").checked,
+      agree_logistics_fixed: !!$("#agree_logistics_fixed") && $("#agree_logistics_fixed").checked,
+      agree_logistics_change: !!$("#agree_logistics_change") && $("#agree_logistics_change").checked
     };
   }
   function submit(){
-    if (!validStep(4)) return;
+    if (!validStep(6)) return;
     var btn = root.querySelector("[data-send]");
     if (btn) btn.disabled = true;
     function done(text){
@@ -364,8 +426,35 @@ JS = r"""
     if (t.hasAttribute("data-send")) submit();
   });
   root.addEventListener("input", scheduleSave);
-  root.addEventListener("change", saveDraft);
-  go(restoreDraft());
+  root.addEventListener("change", function(){ saveDraft(); syncOtherCit(); syncIdOther(); syncVisaStatus(); syncHealth(); });
+  $$('input[name="other_citizenships"]').forEach(function(el){
+    el.addEventListener("change", syncOtherCit);
+  });
+  $$('input[name="id_doc_type"]').forEach(function(el){
+    el.addEventListener("change", syncIdOther);
+  });
+  $$('input[name="visa_current"]').forEach(function(el){
+    el.addEventListener("change", syncVisaStatus);
+  });
+  $$('input[name="allergies"], input[name="health_conditions"], input[name="meal_type"]').forEach(function(el){
+    el.addEventListener("change", syncHealth);
+  });
+  var ocBox = $('[data-field="other_citizenships_detail"]');
+  if (ocBox) ocBox.style.display = "none";
+  var idOtherBox = $('[data-field="id_doc_type_other"]');
+  if (idOtherBox) idOtherBox.style.display = "none";
+  var visaStatusBox = $('[data-field="visa_status"]');
+  if (visaStatusBox) visaStatusBox.style.display = "none";
+  ["allergies_detail","health_conditions_detail","meal_type_other"].forEach(function(name){
+    var box = $('[data-field="'+name+'"]');
+    if (box) box.style.display = "none";
+  });
+  var start = restoreDraft();
+  syncOtherCit();
+  syncIdOther();
+  syncVisaStatus();
+  syncHealth();
+  go(start);
   notifyHeight();
   window.addEventListener("resize", notifyHeight);
 })();
@@ -404,14 +493,30 @@ form.append(
     + C("li")
     + "<li>"
     + C("li")
+    + "<li>"
+    + C("li")
+    + "<li>"
+    + C("li")
     + C("ul")
 )
 
 form.append('<div class="mshk-apply__pane" data-step="1">')
-form.append('<p class="mshk-apply__step-label">1 / 4 \u2014 ' + h("st1") + C("p"))
+form.append('<p class="mshk-apply__section">' + h("sec_general") + C("p"))
 form.append(field("fio_latin", S["fio"], S["fio_h"]))
-form.append(field("health_limits", S["health"], S["health_h"]))
-form.append(radios("meal_type", S["meal"], [(S["meal1"], S["meal1"]), (S["meal2"], S["meal2"])]))
+form.append(radios("gender", S["gender"], [(S["male"], S["male"]), (S["female"], S["female"])]))
+form.append(field("citizenship", S["citizenship"], "", "text", True, True))
+form.append(
+    radios(
+        "other_citizenships",
+        S["other_cit_q"],
+        [(S["yes"], S["yes"]), (S["no"], S["no"])],
+    )
+)
+form.append(field("other_citizenships_detail", S["other_cit_h"], "", "text", False, True))
+form.append(nav(back=True, nxt=True))
+form.append(C("div"))
+
+form.append('<div class="mshk-apply__pane" data-step="2" hidden>')
 form.append('<p class="mshk-apply__section">' + h("sec_id") + C("p"))
 form.append(
     radios(
@@ -420,34 +525,23 @@ form.append(
         [(S["id1"], S["id1"]), (S["id2"], S["id2"]), (S["id3"], S["id3"]), (S["id4"], S["id4"])],
     )
 )
-form.append('<div class="mshk-apply__row">')
+form.append(field("id_doc_type_other", S["id_other"], "", "text", False))
 form.append(field("id_doc_series", S["series"], S["series_h"]))
 form.append(field("id_doc_number", S["number"]))
-form.append(C("div"))
-form.append('<div class="mshk-apply__row">')
 form.append(field("id_doc_issued", S["issued"], "", "date"))
-form.append(field("id_doc_valid_from", S["valid"] + " (" + S["valid_from"] + ")", "", "date"))
-form.append(C("div"))
-form.append(field("id_doc_valid_to", S["valid"] + " (" + S["valid_to"] + ")", "", "date"))
+form.append(field("id_doc_valid_to", S["valid"], S["valid_h"]))
 form.append(field("id_doc_issuer", S["issuer"], "", "text", True, True))
 form.append(field("entry_doc_name", S["entry"]))
-form.append('<div class="mshk-apply__row">')
 form.append(field("entry_doc_series", S["series"], S["series_h"]))
 form.append(field("entry_doc_number", S["number"]))
-form.append(C("div"))
 form.append(field("entry_doc_issued", S["issued"], "", "date"))
-form.append('<div class="mshk-apply__row">')
-form.append(
-    field("entry_doc_valid_from", S["entry_valid"] + " (" + S["valid_from"] + ")", "", "date")
-)
-form.append(field("entry_doc_valid_to", S["entry_valid"] + " (" + S["valid_to"] + ")", "", "date"))
-form.append(C("div"))
+form.append(field("entry_doc_valid_to", S["valid"], S["valid_h"]))
 form.append(field("entry_doc_issuer", S["issuer"], "", "text", True, True))
-form.append(nav(nxt=True))
+form.append(nav(back=True, nxt=True))
 form.append(C("div"))
 
-form.append('<div class="mshk-apply__pane" data-step="2" hidden>')
-form.append('<p class="mshk-apply__step-label">2 / 4 \u2014 ' + h("st2") + C("p"))
+form.append('<div class="mshk-apply__pane" data-step="3" hidden>')
+form.append('<p class="mshk-apply__step-label">3 / 6 \u2014 ' + h("st2") + C("p"))
 form.append('<p class="mshk-apply__section">' + h("sec_route") + C("p"))
 form.append(
     radios(
@@ -473,29 +567,69 @@ form.append(
 form.append(nav(back=True, nxt=True))
 form.append(C("div"))
 
-form.append('<div class="mshk-apply__pane" data-step="3" hidden>')
-form.append('<p class="mshk-apply__step-label">3 / 4 \u2014 ' + h("st3") + C("p"))
+form.append('<div class="mshk-apply__pane" data-step="4" hidden>')
 form.append('<p class="mshk-apply__section">' + h("sec_visa") + C("p"))
 form.append(
     radios(
         "visa_needed",
         S["visa"],
-        [(S["yes"], S["yes"]), (S["no"], S["no"]), (S["dunno"], S["dunno"])],
+        [(S["yes"], S["yes"]), (S["visa_no"], S["visa_no"])],
+        S["visa_h"],
     )
 )
-form.append(radios("transit_visa", S["transit"], [(S["yes"], S["yes"]), (S["no"], S["no"])]))
+form.append(
+    radios(
+        "visa_current",
+        S["visa_current"],
+        [(S["visa_current_yes"], S["visa_current_yes"]), (S["no"], S["no"])],
+    )
+)
+form.append(
+    radios(
+        "visa_status",
+        S["visa_status"],
+        [
+            (S["visa_st1"], S["visa_st1"]),
+            (S["visa_st2"], S["visa_st2"]),
+            (S["visa_st3"], S["visa_st3"]),
+        ],
+        "",
+        False,
+    )
+)
 form.append(nav(back=True, nxt=True))
 form.append(C("div"))
 
-form.append('<div class="mshk-apply__pane" data-step="4" hidden>')
-form.append('<p class="mshk-apply__step-label">4 / 4 \u2014 ' + h("st4") + C("p"))
+form.append('<div class="mshk-apply__pane" data-step="5" hidden>')
+form.append('<p class="mshk-apply__section">' + h("sec_health") + C("p"))
+form.append(radios("allergies", S["allergy"], [(S["yes"], S["yes"]), (S["no"], S["no"])]))
+form.append(field("allergies_detail", S["yes_detail"], "", "text", False, True))
+form.append(
+    radios("health_conditions", S["health_cond"], [(S["yes"], S["yes"]), (S["no"], S["no"])])
+)
+form.append(field("health_conditions_detail", S["yes_detail"], "", "text", False, True))
+form.append(
+    radios(
+        "meal_type",
+        S["meal"],
+        [(S["meal1"], S["meal1"]), (S["meal2"], S["meal2"]), (S["meal3"], S["meal3"])],
+    )
+)
+form.append(field("meal_type_other", S["meal_other"], "", "text", False))
+form.append(nav(back=True, nxt=True))
+form.append(C("div"))
+
+form.append('<div class="mshk-apply__pane" data-step="6" hidden>')
 form.append('<p class="mshk-apply__section">' + h("sec_resp") + C("p"))
 form.append('<p class="mshk-apply__hint" style="margin-bottom:16px">' + h("resp_h") + C("p"))
-form.append(agree("agree_tickets", S["a1"]))
+form.append(agree("agree_participate", S["a1"]))
 form.append(agree("agree_notice", S["a2"]))
 form.append(agree("agree_truth", S["a3"]))
 form.append(agree("agree_extra_docs", S["a4"]))
 form.append(agree("agree_refusal", S["a5"]))
+form.append(agree("agree_logistics_city", S["a6"]))
+form.append(agree("agree_logistics_change", S["a8"]))
+form.append(agree("agree_logistics_fixed", S["a7"]))
 form.append(nav(back=True, send=True))
 form.append(C("div"))
 

@@ -160,8 +160,9 @@ CSS = r"""
 .mshk-apply__title span{display:block;font-weight:400;color:var(--ink);font-size:.62em;letter-spacing:-.02em;margin-bottom:8px}
 .mshk-apply__lead{margin:0 0 16px;font-family:var(--serif)!important;font-size:clamp(16px,1.4vw,19px);font-style:italic;line-height:1.55;color:var(--ink)}
 .mshk-apply__p{margin:0 0 14px;font-size:15px;font-weight:300;line-height:1.65;color:var(--ink);font-family:var(--sans)!important}
-.mshk-apply__meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:22px 0}
+.mshk-apply__meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0}
 .mshk-apply__chip{padding:12px 14px;background:var(--white);border:1px solid rgba(34,63,154,.1);border-radius:14px;font-size:13px;line-height:1.35;color:var(--navy);font-family:var(--sans)!important}
+.mshk-apply__chip--wide{grid-column:1 / -1}
 .mshk-apply__waves{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:8px 0 22px}
 .mshk-apply__wave{padding:14px 16px;background:var(--white);border-radius:16px;border:1px solid rgba(34,63,154,.08);box-shadow:0 1px 2px rgba(10,16,20,.04)}
 .mshk-apply__wave b{display:block;margin:0 0 4px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:500;font-family:var(--sans)!important}
@@ -605,7 +606,6 @@ JS = r"""
 JS = JS.replace("__I18N__", js_i18n).replace("__BODY__", json.dumps(consent_body, ensure_ascii=False))
 
 aud = [
-    (S["aud1"], S["aud1"]),
     (S["aud2"], S["aud2"]),
     (S["aud3"], S["aud3"]),
     (S["aud4"], S["aud4"]),
@@ -655,8 +655,10 @@ html.append('<p class="mshk-apply__lead">' + h("lead") + "</p>")
 html.append('<p class="mshk-apply__p">' + h("p1") + "</p>")
 html.append('<p class="mshk-apply__p">' + h("p2") + "</p>")
 html.append('<div class="mshk-apply__meta">')
-for key in ("format", "place", "lang", "age"):
-    html.append('<div class="mshk-apply__chip">' + h(key) + "</div>")
+html.append('<div class="mshk-apply__chip">' + h("format") + "</div>")
+html.append('<div class="mshk-apply__chip">' + h("lang") + "</div>")
+html.append('<div class="mshk-apply__chip mshk-apply__chip--wide">' + h("place") + "</div>")
+html.append('<div class="mshk-apply__chip">' + h("age") + "</div>")
 html.append("</div>")
 html.append('<p class="mshk-apply__step-label">' + h("dates_title") + "</p>")
 html.append('<div class="mshk-apply__waves">')
@@ -665,7 +667,6 @@ for n, d in (("s1", "s1d"), ("s2", "s2d"), ("s3", "s3d"), ("s4", "s4d")):
         '<div class="mshk-apply__wave"><b>' + h(n) + "</b><span>" + h(d) + "</span></div>"
     )
 html.append("</div>")
-html.append('<p class="mshk-apply__p" style="font-size:13px">' + h("place_full") + "</p>")
 html.append('<div class="mshk-apply__note">' + h("note_dates") + "</div>")
 html.append('<div class="mshk-apply__note">' + h("note_apply") + "</div>")
 html.append('<div class="mshk-apply__note">' + h("note_email") + "</div>")
@@ -673,6 +674,7 @@ html.append('<div class="mshk-apply__fin"><h3>' + h("finance_title") + "</h3>")
 html.append("<p>" + h("finance_fee") + "</p><ul>")
 html.append("<li>" + h("fin1") + "</li><li>" + h("fin2") + "</li><li>" + h("fin3") + "</li>")
 html.append("</ul></div>")
+html.append('<div class="mshk-apply__note">' + h("legal") + "</div>")
 
 intro = "\n".join(html) + "\n</div></section>"
 

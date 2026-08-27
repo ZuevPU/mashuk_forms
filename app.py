@@ -131,6 +131,10 @@ def on_startup():
         init_schema()
     except Exception:
         log.exception("schema init failed")
+    try:
+        ensure_info_columns()
+    except Exception:
+        log.exception("info columns check failed")
     log.info("uploads dir %s exists=%s", UPLOAD_DIR, UPLOAD_DIR.is_dir())
 
 
@@ -167,9 +171,19 @@ def health():
 
 INFO_COLS = [
     "fio_latin",
+    "gender",
+    "citizenship",
+    "other_citizenships",
+    "other_citizenships_detail",
     "health_limits",
+    "allergies",
+    "allergies_detail",
+    "health_conditions",
+    "health_conditions_detail",
     "meal_type",
+    "meal_type_other",
     "id_doc_type",
+    "id_doc_type_other",
     "id_doc_series",
     "id_doc_number",
     "id_doc_issued",
@@ -189,14 +203,47 @@ INFO_COLS = [
     "return_ticket",
     "baggage",
     "visa_needed",
+    "visa_current",
+    "visa_status",
     "transit_visa",
     "agree_tickets",
+    "agree_participate",
     "agree_notice",
     "agree_truth",
     "agree_extra_docs",
     "agree_refusal",
+    "agree_logistics_city",
+    "agree_logistics_fixed",
+    "agree_logistics_change",
     "payload_raw",
 ]
+
+
+def ensure_info_columns() -> None:
+    if not DATABASE_URL:
+        return
+    ident = re.compile(r"^[a-z_][a-z0-9_]*$")
+    with psycopg.connect(DATABASE_URL) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT column_name FROM information_schema.columns
+                WHERE table_schema = current_schema()
+                  AND table_name = 'participant_details'
+                """
+            )
+            existing = {row[0] for row in cur.fetchall()}
+            missing = [col for col in INFO_COLS if col not in existing]
+            for col in missing:
+                if not ident.match(col):
+                    raise RuntimeError("unsafe column name: " + col)
+                kind = "JSONB" if col == "payload_raw" else "TEXT"
+                cur.execute(
+                    f"ALTER TABLE participant_details ADD COLUMN IF NOT EXISTS {col} {kind}"
+                )
+        conn.commit()
+    if missing:
+        log.warning("added missing participant_details columns: %s", missing)
 
 
 def as_yes_no(value) -> str:
@@ -401,15 +448,28 @@ async def info_submit(request: Request):
         raise HTTPException(400, "payload must be an object")
     if not str(data.get("fio_latin") or "").strip():
         raise HTTPException(400, "fio_latin required")
+    if not str(data.get("gender") or "").strip():
+        raise HTTPException(400, "gender required")
+    if not str(data.get("citizenship") or "").strip():
+        raise HTTPException(400, "citizenship required")
+    if not str(data.get("other_citizenships") or "").strip():
+        raise HTTPException(400, "other_citizenships required")
+    if str(data.get("other_citizenships") or "").strip() == "\u0414\u0430":
+        if not str(data.get("other_citizenships_detail") or "").strip():
+            raise HTTPException(400, "other_citizenships_detail required")
     if not str(data.get("stream") or "").strip():
         raise HTTPException(400, "stream required")
 
     bool_cols = {
         "agree_tickets",
+        "agree_participate",
         "agree_notice",
         "agree_truth",
         "agree_extra_docs",
         "agree_refusal",
+        "agree_logistics_city",
+        "agree_logistics_fixed",
+        "agree_logistics_change",
     }
     values = []
     for col in INFO_COLS:
