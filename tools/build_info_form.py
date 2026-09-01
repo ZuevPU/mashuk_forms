@@ -179,6 +179,14 @@ JS = r"""
 (function(){
   var root = document.getElementById("mshk-form") || document.getElementById("mshk-apply");
   if (!root) return;
+  if (window.parent && window.parent !== window) {
+    document.documentElement.classList.add("mshk-embed");
+  }
+  function framed(){ return !!(window.parent && window.parent !== window); }
+  function scrollFormTop(){
+    if (framed()) { window.scrollTo(0, 0); return; }
+    try { root.scrollIntoView({behavior:"smooth", block:"start"}); } catch (e) {}
+  }
   var T = __I18N__;
   var ENDPOINT = (window.MSHK_INFO_ENDPOINT || "/info").trim();
   var step = 1;
@@ -203,23 +211,29 @@ JS = r"""
     if (el.type === "checkbox") return el.checked ? (el.value || "yes") : "";
     return (el.value || "").trim();
   }
+  var lastSentH = 0;
   function notifyHeight(){
     try {
-      var h = Math.max(
-        document.documentElement.scrollHeight || 0,
-        document.body ? document.body.scrollHeight : 0,
-        root.offsetHeight || 0
-      );
-      if (window.parent && window.parent !== window) {
-        window.parent.postMessage({ type: "mshk-apply-height", height: h + 32 }, "*");
-      }
+      if (!framed()) return;
+      var h = 0;
+      ["mshk-apply", "mshk-form"].forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) h += el.offsetHeight || 0;
+      });
+      if (!h && root) h = root.offsetHeight || 0;
+      h = Math.ceil(h + 8);
+      if (h < 320) h = 320;
+      if (h > 4000) h = 4000;
+      if (Math.abs(h - lastSentH) < 4) return;
+      lastSentH = h;
+      window.parent.postMessage({ type: "mshk-apply-height", height: h }, "*");
     } catch (err) {}
   }
   function go(n){
     step = n;
     panes.forEach(function(p){ p.hidden = p.getAttribute("data-step") != String(n); });
     bars.forEach(function(b,i){ b.classList.toggle("is-on", i < n); });
-    root.scrollIntoView({behavior:"smooth", block:"start"});
+    scrollFormTop();
     setTimeout(notifyHeight, 50);
     saveDraft();
   }
@@ -362,14 +376,12 @@ JS = r"""
       id_doc_series: val("id_doc_series"),
       id_doc_number: val("id_doc_number"),
       id_doc_issued: val("id_doc_issued"),
-      id_doc_valid_from: "",
       id_doc_valid_to: val("id_doc_valid_to"),
       id_doc_issuer: val("id_doc_issuer"),
       entry_doc_name: val("entry_doc_name"),
       entry_doc_series: val("entry_doc_series"),
       entry_doc_number: val("entry_doc_number"),
       entry_doc_issued: val("entry_doc_issued"),
-      entry_doc_valid_from: "",
       entry_doc_valid_to: val("entry_doc_valid_to"),
       entry_doc_issuer: val("entry_doc_issuer"),
       stream: val("stream"),
@@ -380,8 +392,6 @@ JS = r"""
       visa_needed: val("visa_needed"),
       visa_current: val("visa_current"),
       visa_status: val("visa_current")==="\u041d\u0435\u0442" ? val("visa_status") : "",
-      transit_visa: "",
-      agree_tickets: false,
       agree_participate: !!$("#agree_participate") && $("#agree_participate").checked,
       agree_notice: !!$("#agree_notice") && $("#agree_notice").checked,
       agree_truth: !!$("#agree_truth") && $("#agree_truth").checked,
@@ -401,7 +411,7 @@ JS = r"""
       var box = $("#mshk-apply-done");
       box.hidden = false;
       box.querySelector("p").textContent = text;
-      root.scrollIntoView({behavior:"smooth"});
+      scrollFormTop();
       setTimeout(notifyHeight, 50);
     }
     fetch(ENDPOINT, {
@@ -513,7 +523,7 @@ form.append(
     )
 )
 form.append(field("other_citizenships_detail", S["other_cit_h"], "", "text", False, True))
-form.append(nav(back=True, nxt=True))
+form.append(nav(back=False, nxt=True))
 form.append(C("div"))
 
 form.append('<div class="mshk-apply__pane" data-step="2" hidden>')
@@ -667,7 +677,7 @@ preview = (
     "  <title>"
     + eh(S["title1"])
     + C("title")
-    + "\n  <style>html,body{margin:0;padding:0;background:#fafafa}"
+    + "\n  <style>html,body{margin:0;padding:0;height:auto;min-height:0;max-width:100%;overflow-x:hidden;background:#fafafa}"
     + C("style")
     + "\n"
     + C("head")

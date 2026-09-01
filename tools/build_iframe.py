@@ -1,15 +1,16 @@
-<!-- Tilda T123, padding 0, full width.
-     Page: seminar application. DELETE the old iframe block, then paste this.
-     Record: Stretch / full width. Height: 0 / Auto. -->
-<div id="mshk-a-clip" style="box-sizing:border-box;width:100%;max-width:none;height:100vh;overflow:hidden;background:#fafafa;margin:0;padding:0;">
-  <iframe id="mshk-a-frame" src="https://zuevpu-mashuk-forms-e759.twc1.net/" title="Mashuk apply" loading="eager" scrolling="yes" allow="clipboard-write" style="display:block;width:100%;max-width:none;height:100vh;border:0;background:#fafafa;pointer-events:auto;touch-action:manipulation;margin:0;padding:0;"></iframe>
-</div>
-<script>
+# -*- coding: utf-8 -*-
+"""Tilda T123 iframe snippets. ASCII only."""
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+TILDA = ROOT / "tilda"
+
+SCRIPT = r"""
 (function () {
-  var clip = document.getElementById("mshk-a-clip");
-  var frame = document.getElementById("mshk-a-frame");
+  var clip = document.getElementById("__CLIP__");
+  var frame = document.getElementById("__FRAME__");
   if (!clip || !frame) return;
-  var old = document.getElementById("mshk-apply-wrap");
+  var old = document.getElementById("__OLD__");
   if (old) old.style.cssText = "display:none!important;height:0!important;overflow:hidden!important";
   var lastH = 0;
   var busy = 0;
@@ -91,4 +92,48 @@
     pin();
   });
 })();
-</script>
+"""
+
+
+def block(kind):
+    if kind == "apply":
+        clip, frame = "mshk-a-clip", "mshk-a-frame"
+        src = "https://zuevpu-mashuk-forms-e759.twc1.net/"
+        title = "Mashuk apply"
+        old = "mshk-apply-wrap"
+        page = "seminar application"
+    else:
+        clip, frame = "mshk-i-clip", "mshk-i-frame"
+        src = "https://zuevpu-mashuk-forms-e759.twc1.net/info"
+        title = "Mashuk participant data"
+        old = "mshk-info-wrap"
+        page = "participant data"
+    js = SCRIPT.replace("__CLIP__", clip).replace("__FRAME__", frame).replace("__OLD__", old)
+    return (
+        "<!-- Tilda T123, padding 0, full width.\n"
+        "     Page: " + page + ". DELETE the old iframe block, then paste this.\n"
+        "     Record: Stretch / full width. Height: 0 / Auto. -->\n"
+        '<div id="' + clip + '" style="box-sizing:border-box;width:100%;max-width:none;'
+        'height:100vh;overflow:hidden;background:#fafafa;margin:0;padding:0;">\n'
+        '  <iframe id="' + frame + '" src="' + src + '" title="' + title + '" '
+        'loading="eager" scrolling="yes" allow="clipboard-write" '
+        'style="display:block;width:100%;max-width:none;height:100vh;border:0;'
+        'background:#fafafa;pointer-events:auto;touch-action:manipulation;'
+        'margin:0;padding:0;"></iframe>\n'
+        "</div>\n"
+        "<script>" + js + "</script>\n"
+    )
+
+
+def main():
+    TILDA.mkdir(parents=True, exist_ok=True)
+    apply_html = block("apply")
+    info_html = block("info")
+    (TILDA / "tilda-iframe-block.html").write_text(apply_html, encoding="utf-8")
+    (TILDA / "tilda-iframe-info.html").write_text(info_html, encoding="utf-8")
+    print("wrote", TILDA / "tilda-iframe-block.html", len(apply_html))
+    print("wrote", TILDA / "tilda-iframe-info.html", len(info_html))
+
+
+if __name__ == "__main__":
+    main()

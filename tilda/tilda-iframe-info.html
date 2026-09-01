@@ -1,18 +1,94 @@
 <!-- Tilda T123, padding 0, full width.
-     Page: https://mashuk.online/educationatitsbest -->
-<iframe
-  id="mshk-apply-frame"
-  src="https://zuevpu-mashuk-forms-e759.twc1.net/info"
-  title="Mashuk participant data"
-  loading="lazy"
-  style="display:block;width:100%;border:0;min-height:1100px;background:#fafafa;">
-</iframe>
+     Page: participant data. DELETE the old iframe block, then paste this.
+     Record: Stretch / full width. Height: 0 / Auto. -->
+<div id="mshk-i-clip" style="box-sizing:border-box;width:100%;max-width:none;height:100vh;overflow:hidden;background:#fafafa;margin:0;padding:0;">
+  <iframe id="mshk-i-frame" src="https://zuevpu-mashuk-forms-e759.twc1.net/info" title="Mashuk participant data" loading="eager" scrolling="yes" allow="clipboard-write" style="display:block;width:100%;max-width:none;height:100vh;border:0;background:#fafafa;pointer-events:auto;touch-action:manipulation;margin:0;padding:0;"></iframe>
+</div>
 <script>
-window.addEventListener("message", function (e) {
-  if (!e.data || e.data.type !== "mshk-apply-height") return;
-  var frame = document.getElementById("mshk-apply-frame");
-  if (!frame) return;
-  var h = Number(e.data.height);
-  if (h > 400 && h < 20000) frame.style.height = h + "px";
-});
+(function () {
+  var clip = document.getElementById("mshk-i-clip");
+  var frame = document.getElementById("mshk-i-frame");
+  if (!clip || !frame) return;
+  var old = document.getElementById("mshk-info-wrap");
+  if (old) old.style.cssText = "display:none!important;height:0!important;overflow:hidden!important";
+  var lastH = 0;
+  var busy = 0;
+  function recOf(el) {
+    var n = el;
+    for (var i = 0; i < 16 && n; i++) {
+      var id = n.id ? String(n.id) : "";
+      var cn = n.className ? String(n.className) : "";
+      if (id.indexOf("rec") === 0 || cn.indexOf("t-rec") !== -1) return n;
+      n = n.parentElement;
+    }
+    return el.parentElement;
+  }
+  function bleed() {
+    var rec = recOf(clip);
+    var n = clip;
+    for (var i = 0; i < 24 && n && n !== document.body; i++) {
+      n.style.setProperty("width", "100%", "important");
+      n.style.setProperty("max-width", "none", "important");
+      n.style.setProperty("padding-left", "0px", "important");
+      n.style.setProperty("padding-right", "0px", "important");
+      n.style.setProperty("margin-left", "0px", "important");
+      n.style.setProperty("margin-right", "0px", "important");
+      n.style.setProperty("box-sizing", "border-box", "important");
+      var cn = n.className ? String(n.className) : "";
+      if (n === rec || cn.indexOf("t-rec") !== -1) break;
+      n = n.parentElement;
+    }
+    if (rec && rec.style) {
+      rec.style.setProperty("width", "100vw", "important");
+      rec.style.setProperty("max-width", "100vw", "important");
+      rec.style.setProperty("margin-left", "calc(50% - 50vw)", "important");
+      rec.style.setProperty("margin-right", "calc(50% - 50vw)", "important");
+      rec.style.setProperty("padding-left", "0px", "important");
+      rec.style.setProperty("padding-right", "0px", "important");
+      rec.style.setProperty("left", "0px", "important");
+      rec.style.setProperty("overflow", "hidden", "important");
+      rec.style.setProperty("padding-bottom", "0px", "important");
+    }
+  }
+  function cap() {
+    var vh = window.innerHeight || 640;
+    var rec = recOf(clip);
+    var top = 0;
+    try {
+      if (rec) top = rec.getBoundingClientRect().top;
+    } catch (e) {}
+    var remain = Math.round(vh - Math.max(0, top) - 2);
+    return Math.max(480, remain);
+  }
+  function pin() {
+    if (busy) return;
+    busy = 1;
+    bleed();
+    var h = cap();
+    if (!(lastH && Math.abs(h - lastH) < 8)) {
+      lastH = h;
+      var px = h + "px";
+      clip.style.cssText = "box-sizing:border-box;width:100%;max-width:none;height:" + px + ";max-height:" + px + ";min-height:" + px + ";overflow:hidden;background:#fafafa;line-height:normal;margin:0;padding:0;";
+      frame.style.cssText = "display:block;width:100%;max-width:none;height:" + px + ";max-height:" + px + ";border:0;background:#fafafa;pointer-events:auto;touch-action:manipulation;margin:0;padding:0;";
+      frame.setAttribute("scrolling", "yes");
+      var rec = recOf(clip);
+      if (rec && rec.style) {
+        rec.style.setProperty("min-height", "0px", "important");
+        rec.style.setProperty("max-height", (h + 8) + "px", "important");
+      }
+    }
+    busy = 0;
+  }
+  pin();
+  setTimeout(pin, 200);
+  setTimeout(pin, 800);
+  window.addEventListener("orientationchange", function () {
+    lastH = 0;
+    setTimeout(pin, 300);
+  });
+  window.addEventListener("resize", function () {
+    lastH = 0;
+    pin();
+  });
+})();
 </script>
