@@ -136,7 +136,7 @@ def file_box(name, label, hint, accept, note_id):
         + name
         + '" accept="'
         + accept
-        + '" hidden><span class="mshk-apply__drop-btn">'
+        + '"><span class="mshk-apply__drop-btn">'
         + h("upload")
         + '</span><span class="mshk-apply__drop-name" id="'
         + note_id
@@ -150,7 +150,7 @@ html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;background:#fafafa
 #mshk-apply{--navy:#223f9a;--sky:#54a4db;--stone:#dcdedd;--ink:#332d24;--black:#0a1014;--paper:#fafafa;--white:#fff;--gold:#a2855f;--sans:"Geologica",Verdana,system-ui,sans-serif;--serif:"Noto Serif","Times New Roman",serif;--ease:cubic-bezier(.22,1,.36,1);--pad:clamp(16px,4vw,48px);position:relative;isolation:isolate;overflow:hidden;box-sizing:border-box;width:100%;max-width:100%;margin:0;padding:clamp(28px,5vw,56px) 0 12px;color:var(--ink);background-color:var(--paper);background-image:radial-gradient(ellipse 70% 55% at 8% 12%,rgba(84,164,219,.16),transparent 58%),radial-gradient(ellipse 55% 50% at 92% 8%,rgba(34,63,154,.12),transparent 52%),radial-gradient(ellipse 50% 45% at 78% 88%,rgba(162,133,95,.11),transparent 55%);font-family:var(--sans);-webkit-font-smoothing:antialiased}
 #mshk-apply *,#mshk-apply *::before,#mshk-apply *::after,#mshk-form *,#mshk-form *::before,#mshk-form *::after{box-sizing:border-box}
 #mshk-apply a,#mshk-form a{color:var(--navy);text-decoration:none}
-#mshk-form{--navy:#223f9a;--sky:#54a4db;--stone:#dcdedd;--ink:#332d24;--black:#0a1014;--paper:#fafafa;--white:#fff;--gold:#a2855f;--sans:"Geologica",Verdana,system-ui,sans-serif;--serif:"Noto Serif","Times New Roman",serif;--ease:cubic-bezier(.22,1,.36,1);--pad:clamp(16px,4vw,48px);position:relative;isolation:isolate;overflow:hidden;box-sizing:border-box;width:100%;max-width:100%;margin:0;padding:8px 0 32px;color:var(--ink);background:var(--paper);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+#mshk-form{--navy:#223f9a;--sky:#54a4db;--stone:#dcdedd;--ink:#332d24;--black:#0a1014;--paper:#fafafa;--white:#fff;--gold:#a2855f;--sans:"Geologica",Verdana,system-ui,sans-serif;--serif:"Noto Serif","Times New Roman",serif;--ease:cubic-bezier(.22,1,.36,1);--pad:clamp(16px,4vw,48px);position:relative;isolation:isolate;overflow:visible;box-sizing:border-box;width:100%;max-width:100%;margin:0;padding:8px 0 32px;color:var(--ink);background:var(--paper);font-family:var(--sans);-webkit-font-smoothing:antialiased}
 #mshk-apply{padding-bottom:12px}
 .mshk-apply__geo{position:absolute;border:1px solid rgba(34,63,154,.12);border-radius:50%;pointer-events:none;z-index:0}
 .mshk-apply__geo--lg{width:min(58vw,640px);height:min(58vw,640px);top:-18%;right:-8%}
@@ -199,7 +199,9 @@ html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;background:#fafafa
 .mshk-apply__btn--ghost{background:transparent;color:var(--navy);border:1px solid rgba(34,63,154,.2)}
 .mshk-apply__btn--navy{background:var(--navy);color:#fff}
 .mshk-apply__btn--gold{background:var(--gold);color:#fff}
-.mshk-apply__drop{display:flex;align-items:center;gap:14px;padding:16px;border:1px dashed rgba(34,63,154,.28);border-radius:16px;background:rgba(34,63,154,.03);cursor:pointer}
+.mshk-apply__field.is-invalid .mshk-apply__input,.mshk-apply__field.is-invalid .mshk-apply__area,.mshk-apply__field.is-invalid .mshk-apply__drop{border-color:#9a2233}
+.mshk-apply__drop{position:relative;display:flex;align-items:center;gap:14px;padding:16px;border:1px dashed rgba(34,63,154,.28);border-radius:16px;background:rgba(34,63,154,.03);cursor:pointer}
+.mshk-apply__drop input[type=file]{position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px}
 .mshk-apply__drop-btn{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:999px;background:var(--navy);color:#fff;font-size:14px;font-family:var(--sans)!important}
 .mshk-apply__drop-name{font-size:13px;color:rgba(51,45,36,.7);font-family:var(--sans)!important}
 .mshk-apply__consent{margin:0 0 20px;padding:18px 18px 8px;border-radius:18px;background:rgba(34,63,154,.05);border:1px solid rgba(34,63,154,.08)}
@@ -208,9 +210,9 @@ html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;background:#fafafa
 .mshk-apply__count{margin:6px 0 0;font-size:12px;color:rgba(51,45,36,.55);font-family:var(--sans)!important;text-align:right}
 .mshk-apply__links{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 16px}
 html.mshk-embed,html.mshk-embed body{width:100%;max-width:100%;height:100%;max-height:100%;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:manipulation}
-html.mshk-embed #mshk-apply,html.mshk-embed #mshk-form{width:100%;max-width:100%;box-sizing:border-box}
+html.mshk-embed #mshk-apply,html.mshk-embed #mshk-form{width:100%;max-width:100%;box-sizing:border-box;overflow:visible}
 html.mshk-embed #mshk-apply{padding:12px 0 8px}
-html.mshk-embed #mshk-form{padding:4px 0 24px}
+html.mshk-embed #mshk-form{padding:4px 0 48px}
 html.mshk-embed .mshk-apply__shell{width:calc(100% - 24px);max-width:none}
 html.mshk-embed .mshk-apply__btn,html.mshk-embed .mshk-apply__choice,html.mshk-embed .mshk-apply__input,html.mshk-embed .mshk-apply__drop{touch-action:manipulation;-webkit-tap-highlight-color:rgba(34,63,154,.12)}
 @media(max-width:820px){.mshk-apply__meta,.mshk-apply__waves,.mshk-apply__row{grid-template-columns:1fr 1fr}.mshk-apply__shell{width:calc(100% - 16px)}.mshk-apply__geo{display:none}.mshk-apply__card{padding:18px}}
@@ -280,6 +282,8 @@ JS = r"""
     if (!wrap) return false;
     var el = wrap.querySelector(".mshk-apply__err");
     if (el){ el.hidden = !msg; el.textContent = msg || ""; }
+    if (msg) wrap.classList.add("is-invalid");
+    else wrap.classList.remove("is-invalid");
     return !msg;
   }
   function val(name){
@@ -328,6 +332,7 @@ JS = r"""
     var el = $("#"+id); var out = $("#"+id+"-count");
     if (!el || !out) return;
     out.textContent = el.value.length + " / 500 " + T.chars;
+    out.style.color = el.value.replace(/^\s+|\s+$/g,"").length < 500 ? "#9a2233" : "";
   }
   ["why","coop"].forEach(function(id){
     var el = $("#"+id);
@@ -338,19 +343,43 @@ JS = r"""
       if (checked("directions").length > 3) el.checked = false;
     });
   });
+  var picked = {};
+  function isPdf(f){
+    if (!f) return false;
+    var t = String(f.type || "").toLowerCase();
+    var n = String(f.name || "").toLowerCase();
+    if (n.indexOf(".pdf") !== -1) return true;
+    if (t.indexOf("pdf") !== -1) return true;
+    return false;
+  }
+  function getFile(id){
+    var input = $("#"+id);
+    if (input && input.files && input.files[0]) {
+      picked[id] = input.files[0];
+      return input.files[0];
+    }
+    return picked[id] || null;
+  }
+  function markFile(id, f){
+    var nameEl = $("#"+id+"-name");
+    if (!nameEl) return;
+    nameEl.textContent = f ? (f.name + " | " + T.file_ok) : "PDF, max 20 MB";
+  }
   function bindFile(id, pdfOnly){
     var input = $("#"+id);
     if (!input) return;
     input.addEventListener("change", function(){
       var f = input.files && input.files[0];
-      var nameEl = $("#"+id+"-name");
-      if (!f){ if (nameEl) nameEl.textContent = "PDF, max 20 MB"; return; }
-      if (f.size > 20*1024*1024){ alert(T.err_file); input.value=""; return; }
-      if (pdfOnly){
-        var ok = f.type === "application/pdf" || /\.pdf$/i.test(f.name);
-        if (!ok){ alert(T.err_pdf); input.value=""; return; }
+      if (!f){
+        if (picked[id]) markFile(id, picked[id]);
+        return;
       }
-      if (nameEl) nameEl.textContent = f.name + " | " + T.file_ok;
+      if (f.size > 20*1024*1024){ alert(T.err_file); input.value=""; picked[id]=null; markFile(id, null); return; }
+      if (f.size < 1){ alert(T.err_pdf); input.value=""; picked[id]=null; markFile(id, null); return; }
+      if (pdfOnly && !isPdf(f)){ alert(T.err_pdf); input.value=""; picked[id]=null; markFile(id, null); return; }
+      picked[id] = f;
+      markFile(id, f);
+      showErr(id, "");
       saveDraft();
       saveFiles();
     });
@@ -387,13 +416,13 @@ JS = r"""
   }
   function putFile(input, file){
     if (!input || !file) return;
+    picked[input.id] = file;
     try {
       var dt = new DataTransfer();
       dt.items.add(file);
       input.files = dt.files;
-      var nameEl = $("#"+input.id+"-name");
-      if (nameEl) nameEl.textContent = file.name + " | " + T.file_ok;
     } catch (e) {}
+    markFile(input.id, file);
   }
   function idbOpen(){
     return new Promise(function(res, rej){
@@ -409,8 +438,8 @@ JS = r"""
       if (!db) return;
       var st = db.transaction("files", "readwrite").objectStore("files");
       var pf = $("#portfolio"); var cf = $("#consent_file");
-      st.put(pf && pf.files[0] ? pf.files[0] : null, "portfolio");
-      st.put(cf && cf.files[0] ? cf.files[0] : null, "consent_file");
+      st.put(getFile("portfolio") || null, "portfolio");
+      st.put(getFile("consent_file") || null, "consent_file");
     });
   }
   function loadFiles(){
@@ -491,13 +520,14 @@ JS = r"""
       if (val("coop").length < 500) { showErr("coop", T.err_500); ok=false; }
       if (checked("directions").length !== 3) { showErr("directions", T.err_dir); ok=false; }
       else showErr("directions","");
-      var pf = $("#portfolio");
-      if (!pf || !pf.files || !pf.files[0]) { showErr("portfolio", T.err_pdf); ok=false; }
+      if (checked("directions").indexOf("\u0414\u0440\u0443\u0433\u043e\u0435")>=0 && !val("directions_other")) { showErr("directions_other", T.req); ok=false; }
+      else showErr("directions_other","");
+      if (!getFile("portfolio")) { showErr("portfolio", T.err_pdf); ok=false; }
       else showErr("portfolio","");
     }
     if (n===4){
-      var cf = $("#consent_file");
-      if (!cf || !cf.files || !cf.files[0]) { showErr("consent_file", T.err_sign); ok=false; }
+      var cf = getFile("consent_file");
+      if (!cf) { showErr("consent_file", T.err_sign); ok=false; }
       else showErr("consent_file","");
       if (!$("#consent_confirm") || !$("#consent_confirm").checked) { showErr("consent_confirm", T.err_confirm); ok=false; }
       else showErr("consent_confirm","");
@@ -505,11 +535,23 @@ JS = r"""
     return ok;
   }
 
+  function focusFirstError(){
+    var pane = root.querySelector(".mshk-apply__pane:not([hidden])") || root;
+    var err = null;
+    var list = pane.querySelectorAll(".mshk-apply__err");
+    for (var i = 0; i < list.length; i++) {
+      if (!list[i].hidden && list[i].textContent) { err = list[i]; break; }
+    }
+    if (!err) return;
+    var wrap = err.closest(".mshk-apply__field") || err;
+    try { wrap.scrollIntoView({behavior:"smooth", block:"center"}); } catch (e) { wrap.scrollIntoView(); }
+  }
+
   root.addEventListener("click", function(e){
     var t = e.target.closest("[data-next],[data-back],[data-download],[data-send]");
     if (!t) return;
     e.preventDefault();
-    if (t.hasAttribute("data-next")) { if (validStep(step)) go(step+1); }
+    if (t.hasAttribute("data-next")) { if (validStep(step)) go(step+1); else focusFirstError(); }
     if (t.hasAttribute("data-back")) go(Math.max(1, step-1));
     if (t.hasAttribute("data-download")) downloadDoc();
     if (t.hasAttribute("data-send")) submit();
@@ -587,9 +629,9 @@ JS = r"""
     if (btn) btn.disabled = true;
     var fd = new FormData();
     fd.append("payload", JSON.stringify(payload()));
-    var pf = $("#portfolio"); var cf = $("#consent_file");
-    if (pf && pf.files[0]) fd.append("portfolio", pf.files[0]);
-    if (cf && cf.files[0]) fd.append("consent", cf.files[0]);
+    var pf = getFile("portfolio"); var cf = getFile("consent_file");
+    if (pf) fd.append("portfolio", pf);
+    if (cf) fd.append("consent", cf);
     function done(ok, text){
       $$(".mshk-apply__pane").forEach(function(p){ p.hidden = true; });
       var box = $("#mshk-apply-done");
@@ -610,6 +652,13 @@ JS = r"""
   root.addEventListener("input", scheduleSave);
   root.addEventListener("change", function(){ saveDraft(); saveFiles(); });
   var startStep = restoreDraft();
+  (function(){
+    var yes = "\u0414\u0430";
+    var box = $('[data-field="intl_details"]');
+    if (box && val("intl_programs")!==yes) box.style.display = "none";
+    box = $('[data-field="ru_details"]');
+    if (box && val("ru_programs")!==yes) box.style.display = "none";
+  })();
   loadFiles().then(function(files){
     if (files) {
       putFile($("#portfolio"), files.portfolio);

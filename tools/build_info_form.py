@@ -199,6 +199,8 @@ JS = r"""
     if (!wrap) return false;
     var el = wrap.querySelector(".mshk-apply__err");
     if (el){ el.hidden = !msg; el.textContent = msg || ""; }
+    if (msg) wrap.classList.add("is-invalid");
+    else wrap.classList.remove("is-invalid");
     return !msg;
   }
   function val(name){
@@ -427,11 +429,22 @@ JS = r"""
       alert(T.err_send);
     });
   }
+  function focusFirstError(){
+    var pane = root.querySelector(".mshk-apply__pane:not([hidden])") || root;
+    var err = null;
+    var list = pane.querySelectorAll(".mshk-apply__err");
+    for (var i = 0; i < list.length; i++) {
+      if (!list[i].hidden && list[i].textContent) { err = list[i]; break; }
+    }
+    if (!err) return;
+    var wrap = err.closest(".mshk-apply__field") || err;
+    try { wrap.scrollIntoView({behavior:"smooth", block:"center"}); } catch (e) { wrap.scrollIntoView(); }
+  }
   root.addEventListener("click", function(e){
     var t = e.target.closest("[data-next],[data-back],[data-send]");
     if (!t) return;
     e.preventDefault();
-    if (t.hasAttribute("data-next")) { if (validStep(step)) go(step+1); }
+    if (t.hasAttribute("data-next")) { if (validStep(step)) go(step+1); else focusFirstError(); }
     if (t.hasAttribute("data-back")) go(Math.max(1, step-1));
     if (t.hasAttribute("data-send")) submit();
   });

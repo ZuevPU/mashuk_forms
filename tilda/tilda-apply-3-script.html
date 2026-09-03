@@ -24,6 +24,8 @@
     if (!wrap) return false;
     var el = wrap.querySelector(".mshk-apply__err");
     if (el){ el.hidden = !msg; el.textContent = msg || ""; }
+    if (msg) wrap.classList.add("is-invalid");
+    else wrap.classList.remove("is-invalid");
     return !msg;
   }
   function val(name){
@@ -72,6 +74,7 @@
     var el = $("#"+id); var out = $("#"+id+"-count");
     if (!el || !out) return;
     out.textContent = el.value.length + " / 500 " + T.chars;
+    out.style.color = el.value.replace(/^\s+|\s+$/g,"").length < 500 ? "#9a2233" : "";
   }
   ["why","coop"].forEach(function(id){
     var el = $("#"+id);
@@ -82,19 +85,43 @@
       if (checked("directions").length > 3) el.checked = false;
     });
   });
+  var picked = {};
+  function isPdf(f){
+    if (!f) return false;
+    var t = String(f.type || "").toLowerCase();
+    var n = String(f.name || "").toLowerCase();
+    if (n.indexOf(".pdf") !== -1) return true;
+    if (t.indexOf("pdf") !== -1) return true;
+    return false;
+  }
+  function getFile(id){
+    var input = $("#"+id);
+    if (input && input.files && input.files[0]) {
+      picked[id] = input.files[0];
+      return input.files[0];
+    }
+    return picked[id] || null;
+  }
+  function markFile(id, f){
+    var nameEl = $("#"+id+"-name");
+    if (!nameEl) return;
+    nameEl.textContent = f ? (f.name + " | " + T.file_ok) : "PDF, max 20 MB";
+  }
   function bindFile(id, pdfOnly){
     var input = $("#"+id);
     if (!input) return;
     input.addEventListener("change", function(){
       var f = input.files && input.files[0];
-      var nameEl = $("#"+id+"-name");
-      if (!f){ if (nameEl) nameEl.textContent = "PDF, max 20 MB"; return; }
-      if (f.size > 20*1024*1024){ alert(T.err_file); input.value=""; return; }
-      if (pdfOnly){
-        var ok = f.type === "application/pdf" || /\.pdf$/i.test(f.name);
-        if (!ok){ alert(T.err_pdf); input.value=""; return; }
+      if (!f){
+        if (picked[id]) markFile(id, picked[id]);
+        return;
       }
-      if (nameEl) nameEl.textContent = f.name + " | " + T.file_ok;
+      if (f.size > 20*1024*1024){ alert(T.err_file); input.value=""; picked[id]=null; markFile(id, null); return; }
+      if (f.size < 1){ alert(T.err_pdf); input.value=""; picked[id]=null; markFile(id, null); return; }
+      if (pdfOnly && !isPdf(f)){ alert(T.err_pdf); input.value=""; picked[id]=null; markFile(id, null); return; }
+      picked[id] = f;
+      markFile(id, f);
+      showErr(id, "");
       saveDraft();
       saveFiles();
     });
@@ -131,13 +158,13 @@
   }
   function putFile(input, file){
     if (!input || !file) return;
+    picked[input.id] = file;
     try {
       var dt = new DataTransfer();
       dt.items.add(file);
       input.files = dt.files;
-      var nameEl = $("#"+input.id+"-name");
-      if (nameEl) nameEl.textContent = file.name + " | " + T.file_ok;
     } catch (e) {}
+    markFile(input.id, file);
   }
   function idbOpen(){
     return new Promise(function(res, rej){
@@ -153,8 +180,8 @@
       if (!db) return;
       var st = db.transaction("files", "readwrite").objectStore("files");
       var pf = $("#portfolio"); var cf = $("#consent_file");
-      st.put(pf && pf.files[0] ? pf.files[0] : null, "portfolio");
-      st.put(cf && cf.files[0] ? cf.files[0] : null, "consent_file");
+      st.put(getFile("portfolio") || null, "portfolio");
+      st.put(getFile("consent_file") || null, "consent_file");
     });
   }
   function loadFiles(){
@@ -235,13 +262,14 @@
       if (val("coop").length < 500) { showErr("coop", T.err_500); ok=false; }
       if (checked("directions").length !== 3) { showErr("directions", T.err_dir); ok=false; }
       else showErr("directions","");
-      var pf = $("#portfolio");
-      if (!pf || !pf.files || !pf.files[0]) { showErr("portfolio", T.err_pdf); ok=false; }
+      if (checked("directions").indexOf("\u0414\u0440\u0443\u0433\u043e\u0435")>=0 && !val("directions_other")) { showErr("directions_other", T.req); ok=false; }
+      else showErr("directions_other","");
+      if (!getFile("portfolio")) { showErr("portfolio", T.err_pdf); ok=false; }
       else showErr("portfolio","");
     }
     if (n===4){
-      var cf = $("#consent_file");
-      if (!cf || !cf.files || !cf.files[0]) { showErr("consent_file", T.err_sign); ok=false; }
+      var cf = getFile("consent_file");
+      if (!cf) { showErr("consent_file", T.err_sign); ok=false; }
       else showErr("consent_file","");
       if (!$("#consent_confirm") || !$("#consent_confirm").checked) { showErr("consent_confirm", T.err_confirm); ok=false; }
       else showErr("consent_confirm","");
@@ -249,11 +277,23 @@
     return ok;
   }
 
+  function focusFirstError(){
+    var pane = root.querySelector(".mshk-apply__pane:not([hidden])") || root;
+    var err = null;
+    var list = pane.querySelectorAll(".mshk-apply__err");
+    for (var i = 0; i < list.length; i++) {
+      if (!list[i].hidden && list[i].textContent) { err = list[i]; break; }
+    }
+    if (!err) return;
+    var wrap = err.closest(".mshk-apply__field") || err;
+    try { wrap.scrollIntoView({behavior:"smooth", block:"center"}); } catch (e) { wrap.scrollIntoView(); }
+  }
+
   root.addEventListener("click", function(e){
     var t = e.target.closest("[data-next],[data-back],[data-download],[data-send]");
     if (!t) return;
     e.preventDefault();
-    if (t.hasAttribute("data-next")) { if (validStep(step)) go(step+1); }
+    if (t.hasAttribute("data-next")) { if (validStep(step)) go(step+1); else focusFirstError(); }
     if (t.hasAttribute("data-back")) go(Math.max(1, step-1));
     if (t.hasAttribute("data-download")) downloadDoc();
     if (t.hasAttribute("data-send")) submit();
@@ -331,9 +371,9 @@
     if (btn) btn.disabled = true;
     var fd = new FormData();
     fd.append("payload", JSON.stringify(payload()));
-    var pf = $("#portfolio"); var cf = $("#consent_file");
-    if (pf && pf.files[0]) fd.append("portfolio", pf.files[0]);
-    if (cf && cf.files[0]) fd.append("consent", cf.files[0]);
+    var pf = getFile("portfolio"); var cf = getFile("consent_file");
+    if (pf) fd.append("portfolio", pf);
+    if (cf) fd.append("consent", cf);
     function done(ok, text){
       $$(".mshk-apply__pane").forEach(function(p){ p.hidden = true; });
       var box = $("#mshk-apply-done");
@@ -354,6 +394,13 @@
   root.addEventListener("input", scheduleSave);
   root.addEventListener("change", function(){ saveDraft(); saveFiles(); });
   var startStep = restoreDraft();
+  (function(){
+    var yes = "\u0414\u0430";
+    var box = $('[data-field="intl_details"]');
+    if (box && val("intl_programs")!==yes) box.style.display = "none";
+    box = $('[data-field="ru_details"]');
+    if (box && val("ru_programs")!==yes) box.style.display = "none";
+  })();
   loadFiles().then(function(files){
     if (files) {
       putFile($("#portfolio"), files.portfolio);
