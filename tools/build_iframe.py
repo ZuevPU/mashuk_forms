@@ -170,7 +170,7 @@ def block(kind):
         title = "Mashuk participant data"
         old = "mshk-info-wrap"
         page = "participant data"
-    contained = kind == "muni"
+    contained = True
     js = (SCRIPT_CONTAINED if contained else SCRIPT).replace("__CLIP__", clip).replace("__FRAME__", frame).replace("__OLD__", old)
     if contained:
         comment = (

@@ -155,7 +155,7 @@ html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;background:#fafafa
 .mshk-apply__geo{position:absolute;border:1px solid rgba(34,63,154,.12);border-radius:50%;pointer-events:none;z-index:0}
 .mshk-apply__geo--lg{width:min(58vw,640px);height:min(58vw,640px);top:-18%;right:-8%}
 .mshk-apply__geo--sm{width:min(28vw,280px);height:min(28vw,280px);bottom:8%;left:-6%}
-.mshk-apply__shell{position:relative;z-index:1;width:calc(100% - var(--pad)*2);max-width:none;margin:0 auto;box-sizing:border-box}
+.mshk-apply__shell{position:relative;z-index:1;width:calc(100% - 40px);max-width:860px;margin-left:auto;margin-right:auto;box-sizing:border-box}
 .mshk-apply__title,.mshk-apply__p,.mshk-apply__lead,.mshk-apply__hint,.mshk-apply__choice span,.mshk-apply__chip,.mshk-apply__wave span{overflow-wrap:break-word;word-wrap:break-word}
 .mshk-apply__kicker{margin:0 0 12px;font-size:12px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-family:var(--sans)!important}
 .mshk-apply__title{margin:0 0 18px;font-size:clamp(28px,4.6vw,48px);font-weight:600;line-height:1.08;letter-spacing:-.03em;color:var(--navy);font-family:var(--sans)!important}
@@ -213,10 +213,10 @@ html.mshk-embed,html.mshk-embed body{width:100%;max-width:100%;height:100%;max-h
 html.mshk-embed #mshk-apply,html.mshk-embed #mshk-form{width:100%;max-width:100%;box-sizing:border-box;overflow:visible}
 html.mshk-embed #mshk-apply{padding:12px 0 8px}
 html.mshk-embed #mshk-form{padding:4px 0 48px}
-html.mshk-embed .mshk-apply__shell{width:calc(100% - 24px);max-width:none}
+html.mshk-embed .mshk-apply__shell{width:calc(100% - 32px);max-width:860px}
 html.mshk-embed .mshk-apply__btn,html.mshk-embed .mshk-apply__choice,html.mshk-embed .mshk-apply__input,html.mshk-embed .mshk-apply__drop{touch-action:manipulation;-webkit-tap-highlight-color:rgba(34,63,154,.12)}
-@media(max-width:820px){.mshk-apply__meta,.mshk-apply__waves,.mshk-apply__row{grid-template-columns:1fr 1fr}.mshk-apply__shell{width:calc(100% - 16px)}.mshk-apply__geo{display:none}.mshk-apply__card{padding:18px}}
-@media(max-width:560px){.mshk-apply__meta,.mshk-apply__waves,.mshk-apply__row{grid-template-columns:1fr}.mshk-apply__nav{flex-direction:column}.mshk-apply__btn{width:100%;max-width:100%}.mshk-apply__title{font-size:26px}.mshk-apply__card{padding:16px;border-radius:18px}}
+@media(max-width:820px){.mshk-apply__meta,.mshk-apply__waves,.mshk-apply__row{grid-template-columns:1fr 1fr}.mshk-apply__shell,html.mshk-embed .mshk-apply__shell{width:calc(100% - 24px);max-width:860px}.mshk-apply__geo{display:none}.mshk-apply__card{padding:18px}}
+@media(max-width:560px){.mshk-apply__meta,.mshk-apply__waves,.mshk-apply__row{grid-template-columns:1fr}.mshk-apply__shell,html.mshk-embed .mshk-apply__shell{width:calc(100% - 16px)}.mshk-apply__nav{flex-direction:column}.mshk-apply__btn{width:100%;max-width:100%}.mshk-apply__title{font-size:26px}.mshk-apply__card{padding:16px;border-radius:18px}}
 """
 
 consent_path = ROOT / "consent" / "consent-text.txt"

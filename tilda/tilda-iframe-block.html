@@ -1,8 +1,9 @@
-<!-- Tilda T123, padding 0, full width.
-     Page: seminar application. DELETE the old iframe block, then paste this.
-     Record: Stretch / full width. Height: 0 / Auto. -->
-<div id="mshk-a-clip" style="box-sizing:border-box;width:100%;max-width:none;height:100vh;overflow:hidden;background:#fafafa;margin:0;padding:0;">
-  <iframe id="mshk-a-frame" src="https://zuevpu-mashuk-forms-e759.twc1.net/" title="Mashuk apply" loading="eager" scrolling="yes" allow="clipboard-write" style="display:block;width:100%;max-width:none;height:100vh;border:0;background:#fafafa;pointer-events:auto;touch-action:manipulation;margin:0;padding:0;"></iframe>
+<!-- Tilda T123. Page: seminar application.
+     DELETE the old iframe block, then paste this.
+     Record: do NOT stretch. Keep standard page width.
+     Height: 0 / Auto. Zero extra padding. -->
+<div id="mshk-a-clip" style="box-sizing:border-box;width:100%;max-width:1200px;height:100vh;overflow:hidden;background:#fafafa;margin:0 auto;padding:0;">
+  <iframe id="mshk-a-frame" src="https://zuevpu-mashuk-forms-e759.twc1.net/" title="Mashuk apply" loading="eager" scrolling="yes" allow="clipboard-write" style="display:block;width:100%;max-width:100%;height:100vh;border:0;background:#fafafa;pointer-events:auto;touch-action:manipulation;margin:0;padding:0;"></iframe>
 </div>
 <script>
 (function () {
@@ -23,33 +24,6 @@
     }
     return el.parentElement;
   }
-  function bleed() {
-    var rec = recOf(clip);
-    var n = clip;
-    for (var i = 0; i < 24 && n && n !== document.body; i++) {
-      n.style.setProperty("width", "100%", "important");
-      n.style.setProperty("max-width", "none", "important");
-      n.style.setProperty("padding-left", "0px", "important");
-      n.style.setProperty("padding-right", "0px", "important");
-      n.style.setProperty("margin-left", "0px", "important");
-      n.style.setProperty("margin-right", "0px", "important");
-      n.style.setProperty("box-sizing", "border-box", "important");
-      var cn = n.className ? String(n.className) : "";
-      if (n === rec || cn.indexOf("t-rec") !== -1) break;
-      n = n.parentElement;
-    }
-    if (rec && rec.style) {
-      rec.style.setProperty("width", "100vw", "important");
-      rec.style.setProperty("max-width", "100vw", "important");
-      rec.style.setProperty("margin-left", "calc(50% - 50vw)", "important");
-      rec.style.setProperty("margin-right", "calc(50% - 50vw)", "important");
-      rec.style.setProperty("padding-left", "0px", "important");
-      rec.style.setProperty("padding-right", "0px", "important");
-      rec.style.setProperty("left", "0px", "important");
-      rec.style.setProperty("overflow", "hidden", "important");
-      rec.style.setProperty("padding-bottom", "0px", "important");
-    }
-  }
   function cap() {
     var vh = window.innerHeight || 640;
     var rec = recOf(clip);
@@ -58,24 +32,18 @@
       if (rec) top = rec.getBoundingClientRect().top;
     } catch (e) {}
     var remain = Math.round(vh - Math.max(0, top) - 2);
-    return Math.max(480, remain);
+    return Math.max(520, remain);
   }
   function pin() {
     if (busy) return;
     busy = 1;
-    bleed();
     var h = cap();
     if (!(lastH && Math.abs(h - lastH) < 8)) {
       lastH = h;
       var px = h + "px";
-      clip.style.cssText = "box-sizing:border-box;width:100%;max-width:none;height:" + px + ";max-height:" + px + ";min-height:" + px + ";overflow:hidden;background:#fafafa;line-height:normal;margin:0;padding:0;";
-      frame.style.cssText = "display:block;width:100%;max-width:none;height:" + px + ";max-height:" + px + ";border:0;background:#fafafa;pointer-events:auto;touch-action:manipulation;margin:0;padding:0;";
+      clip.style.cssText = "box-sizing:border-box;width:100%;max-width:100%;height:" + px + ";max-height:" + px + ";min-height:" + px + ";overflow:hidden;background:#fafafa;line-height:normal;margin:0 auto;padding:0;";
+      frame.style.cssText = "display:block;width:100%;max-width:100%;height:" + px + ";max-height:" + px + ";border:0;background:#fafafa;pointer-events:auto;touch-action:manipulation;margin:0;padding:0;";
       frame.setAttribute("scrolling", "yes");
-      var rec = recOf(clip);
-      if (rec && rec.style) {
-        rec.style.setProperty("min-height", "0px", "important");
-        rec.style.setProperty("max-height", (h + 8) + "px", "important");
-      }
     }
     busy = 0;
   }
