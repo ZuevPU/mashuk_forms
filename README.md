@@ -2,9 +2,13 @@
 
 Анкета и админка семинара Машук.
 
-Публичная форма: `/`
+Публичные формы:
+- `/` — заявка «Образование на высоте»
+- `/info` — данные участников того же семинара
+- `/muni` — заявка «Межнациональные и межконфессиональные отношения в деятельности муниципалитетов»
+
 Админка: `/admin`
-АПИ заявок: `POST /apply`
+АПИ заявок: `POST /apply`, `POST /info`, `POST /muni`
 Проверка: `GET /health`
 
 Репозиторий: https://github.com/ZuevPU/mashuk_forms
@@ -57,7 +61,10 @@ uvicorn main:app --host 0.0.0.0 --port 80
 
 6. Переменные только в панели Timeweb: `DATABASE_URL`, `ADMIN_PASSWORD`, `ADMIN_SECRET`, `UPLOAD_DIR=./uploads`, `MAX_FILE_MB=20`, `CORS_ORIGINS`, `FRAME_ANCESTORS`.
 
-7. В Тильде, блок HTML (T123), код из `tilda/tilda-iframe-block.html`.
+7. В Тильде, блок HTML (T123):
+   - заявка семинара: `tilda/tilda-iframe-block.html`
+   - данные участников: `tilda/tilda-iframe-info.html`
+   - заявка муниципалитетов: `tilda/tilda-iframe-muni.html`
 
 Админку в iframe не встраивать.
 

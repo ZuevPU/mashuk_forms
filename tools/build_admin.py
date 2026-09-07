@@ -44,14 +44,34 @@ T = {
     "dl_portfolio": "\u0421\u043a\u0430\u0447\u0430\u0442\u044c \u043f\u043e\u0440\u0442\u0444\u043e\u043b\u0438\u043e",
     "dl_consent": "\u0421\u043a\u0430\u0447\u0430\u0442\u044c \u0441\u043e\u0433\u043b\u0430\u0441\u0438\u0435",
     "logout": "\u0412\u044b\u0439\u0442\u0438",
-    "form1": "\u0424\u043e\u0440\u043c\u0430 1",
-    "form2": "\u0424\u043e\u0440\u043c\u0430 2",
-    "title_apply": "\u0424\u043e\u0440\u043c\u0430 1 \u2014 \u0417\u0430\u044f\u0432\u043a\u0430",
-    "title_info": "\u0424\u043e\u0440\u043c\u0430 2 \u2014 \u0414\u0430\u043d\u043d\u044b\u0435 \u0443\u0447\u0430\u0441\u0442\u043d\u0438\u043a\u043e\u0432",
+    "form_pick": "\u0424\u043e\u0440\u043c\u0430",
+    "form_apply": "\u041e\u0431\u0440\u0430\u0437\u043e\u0432\u0430\u043d\u0438\u0435 \u043d\u0430 \u0432\u044b\u0441\u043e\u0442\u0435 \u2014 \u0437\u0430\u044f\u0432\u043a\u0430",
+    "form_info": "\u041e\u0431\u0440\u0430\u0437\u043e\u0432\u0430\u043d\u0438\u0435 \u043d\u0430 \u0432\u044b\u0441\u043e\u0442\u0435 \u2014 \u0434\u0430\u043d\u043d\u044b\u0435 \u0443\u0447\u0430\u0441\u0442\u043d\u0438\u043a\u043e\u0432",
+    "form_muni": "\u041c\u0435\u0436\u043d\u0430\u0446\u0438\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0435 \u043e\u0442\u043d\u043e\u0448\u0435\u043d\u0438\u044f \u0432 \u043c\u0443\u043d\u0438\u0446\u0438\u043f\u0430\u043b\u0438\u0442\u0435\u0442\u0430\u0445 \u2014 \u0437\u0430\u044f\u0432\u043a\u0430",
+    "trash": "\u041a\u043e\u0440\u0437\u0438\u043d\u0430",
+    "title_apply": "\u041e\u0431\u0440\u0430\u0437\u043e\u0432\u0430\u043d\u0438\u0435 \u043d\u0430 \u0432\u044b\u0441\u043e\u0442\u0435 \u2014 \u0437\u0430\u044f\u0432\u043a\u0430",
+    "title_info": "\u041e\u0431\u0440\u0430\u0437\u043e\u0432\u0430\u043d\u0438\u0435 \u043d\u0430 \u0432\u044b\u0441\u043e\u0442\u0435 \u2014 \u0434\u0430\u043d\u043d\u044b\u0435 \u0443\u0447\u0430\u0441\u0442\u043d\u0438\u043a\u043e\u0432",
+    "title_muni": "\u041c\u0435\u0436\u043d\u0430\u0446\u0438\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0435 \u043e\u0442\u043d\u043e\u0448\u0435\u043d\u0438\u044f \u0432 \u043c\u0443\u043d\u0438\u0446\u0438\u043f\u0430\u043b\u0438\u0442\u0435\u0442\u0430\u0445 \u2014 \u0437\u0430\u044f\u0432\u043a\u0430",
+    "title_trash_apply": "\u041a\u043e\u0440\u0437\u0438\u043d\u0430 \u2014 \u0437\u0430\u044f\u0432\u043a\u0438 \u00ab\u041e\u0431\u0440\u0430\u0437\u043e\u0432\u0430\u043d\u0438\u0435 \u043d\u0430 \u0432\u044b\u0441\u043e\u0442\u0435\u00bb",
+    "title_trash_info": "\u041a\u043e\u0440\u0437\u0438\u043d\u0430 \u2014 \u0434\u0430\u043d\u043d\u044b\u0435 \u0443\u0447\u0430\u0441\u0442\u043d\u0438\u043a\u043e\u0432",
+    "title_trash_muni": "\u041a\u043e\u0440\u0437\u0438\u043d\u0430 \u2014 \u0437\u0430\u044f\u0432\u043a\u0438 \u043c\u0443\u043d\u0438\u0446\u0438\u043f\u0430\u043b\u0438\u0442\u0435\u0442\u043e\u0432",
+    "search_muni": "\u041f\u043e\u0438\u0441\u043a: \u0424\u0418\u041e, email, \u0442\u0435\u043b\u0435\u0444\u043e\u043d, \u0440\u0435\u0433\u0438\u043e\u043d, \u043c\u0435\u0441\u0442\u043e \u0440\u0430\u0431\u043e\u0442\u044b",
+    "th_region": "\u0420\u0435\u0433\u0438\u043e\u043d",
+    "th_work": "\u041c\u0435\u0441\u0442\u043e \u0440\u0430\u0431\u043e\u0442\u044b",
+    "region": "\u0420\u0435\u0433\u0438\u043e\u043d",
     "search": "\u041f\u043e\u0438\u0441\u043a: \u0424\u0418\u041e, email, \u0442\u0435\u043b\u0435\u0444\u043e\u043d, \u0441\u0442\u0440\u0430\u043d\u0430, \u043e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u044f",
     "search_info": "\u041f\u043e\u0438\u0441\u043a: \u0424\u0418\u041e, \u0441\u0442\u0440\u0430\u043d\u0430, \u0433\u043e\u0440\u043e\u0434, \u043f\u043e\u0442\u043e\u043a",
     "empty": "\u0417\u0430\u044f\u0432\u043e\u043a \u043f\u043e\u043a\u0430 \u043d\u0435\u0442",
     "empty_info": "\u0410\u043d\u043a\u0435\u0442 \u043f\u043e\u043a\u0430 \u043d\u0435\u0442",
+    "empty_trash": "\u041a\u043e\u0440\u0437\u0438\u043d\u0430 \u043f\u0443\u0441\u0442\u0430",
+    "count": "\u0437\u0430\u044f\u0432\u043e\u043a",
+    "count_info": "\u0430\u043d\u043a\u0435\u0442",
+    "count_trash": "\u0432 \u043a\u043e\u0440\u0437\u0438\u043d\u0435",
+    "th_deleted": "\u0423\u0434\u0430\u043b\u0435\u043d\u0430",
+    "delete": "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0432 \u043a\u043e\u0440\u0437\u0438\u043d\u0443",
+    "restore": "\u0412\u043e\u0441\u0441\u0442\u0430\u043d\u043e\u0432\u0438\u0442\u044c",
+    "trash_confirm": "\u0417\u0430\u044f\u0432\u043a\u0430 \u0441\u043a\u0440\u043e\u0435\u0442\u0441\u044f \u0438\u0437 \u0441\u043f\u0438\u0441\u043a\u0430 \u0438 \u043f\u043e\u043f\u0430\u0434\u0451\u0442 \u0432 \u043a\u043e\u0440\u0437\u0438\u043d\u0443. \u041f\u0440\u043e\u0434\u043e\u043b\u0436\u0438\u0442\u044c?",
+    "restore_confirm": "\u0412\u0435\u0440\u043d\u0443\u0442\u044c \u0437\u0430\u043f\u0438\u0441\u044c \u0432 \u043e\u0431\u0449\u0438\u0439 \u0441\u043f\u0438\u0441\u043e\u043a?",
     "count": "\u0437\u0430\u044f\u0432\u043e\u043a",
     "count_info": "\u0430\u043d\u043a\u0435\u0442",
     "th_meal": "\u041f\u0438\u0442\u0430\u043d\u0438\u0435",
@@ -118,6 +138,7 @@ LABELS = {
     "passport_number": "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u043d\u043e\u043c\u0435\u0440",
     "passport_date": "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u0434\u0430\u0442\u0430",
     "passport_issued": "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d",
+    "deleted_at": "\u0423\u0434\u0430\u043b\u0435\u043d\u0430",
 }
 
 LABELS_INFO = {
@@ -140,14 +161,12 @@ LABELS_INFO = {
     "id_doc_series": "\u0421\u0435\u0440\u0438\u044f \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430",
     "id_doc_number": "\u041d\u043e\u043c\u0435\u0440 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430",
     "id_doc_issued": "\u0414\u0430\u0442\u0430 \u0432\u044b\u0434\u0430\u0447\u0438",
-    "id_doc_valid_from": "\u0421\u0440\u043e\u043a \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044f \u0441",
     "id_doc_valid_to": "\u0421\u0440\u043e\u043a \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044f",
     "id_doc_issuer": "\u041a\u0435\u043c \u0432\u044b\u0434\u0430\u043d",
     "entry_doc_name": "\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442 \u0434\u043b\u044f \u0432\u044a\u0435\u0437\u0434\u0430 \u0432 \u0420\u0424",
     "entry_doc_series": "\u0412\u044a\u0435\u0437\u0434: \u0441\u0435\u0440\u0438\u044f",
     "entry_doc_number": "\u0412\u044a\u0435\u0437\u0434: \u043d\u043e\u043c\u0435\u0440",
     "entry_doc_issued": "\u0412\u044a\u0435\u0437\u0434: \u0434\u0430\u0442\u0430 \u0432\u044b\u0434\u0430\u0447\u0438",
-    "entry_doc_valid_from": "\u0412\u044a\u0435\u0437\u0434: \u0441\u0440\u043e\u043a \u0441",
     "entry_doc_valid_to": "\u0412\u044a\u0435\u0437\u0434: \u0441\u0440\u043e\u043a \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044f",
     "entry_doc_issuer": "\u0412\u044a\u0435\u0437\u0434: \u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d",
     "stream": T["stream"],
@@ -158,8 +177,6 @@ LABELS_INFO = {
     "visa_needed": "\u0412\u0438\u0437\u0430 \u0432 \u0420\u0424",
     "visa_current": "\u0414\u0435\u0439\u0441\u0442\u0432\u0443\u044e\u0449\u0430\u044f \u0432\u0438\u0437\u0430",
     "visa_status": "\u0421\u0442\u0430\u0442\u0443\u0441 \u043e\u0444\u043e\u0440\u043c\u043b\u0435\u043d\u0438\u044f \u0432\u0438\u0437\u044b",
-    "transit_visa": "\u0422\u0440\u0430\u043d\u0437\u0438\u0442\u043d\u0430\u044f \u0432\u0438\u0437\u0430",
-    "agree_tickets": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0431\u0438\u043b\u0435\u0442\u044b \u0431\u0435\u0437 \u0432\u043e\u0437\u0432\u0440\u0430\u0442\u0430",
     "agree_participate": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0443\u0447\u0430\u0441\u0442\u0438\u0435 \u0432 \u0441\u0435\u043c\u0438\u043d\u0430\u0440\u0435",
     "agree_notice": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u0435 \u0437\u0430 12 \u0434\u043d\u0435\u0439",
     "agree_truth": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0434\u043e\u0441\u0442\u043e\u0432\u0435\u0440\u043d\u043e\u0441\u0442\u044c",
@@ -168,11 +185,35 @@ LABELS_INFO = {
     "agree_logistics_city": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u043b\u043e\u0433\u0438\u0441\u0442\u0438\u043a\u0430 \u0438\u0437 \u0433\u043e\u0440\u043e\u0434\u0430 \u043f\u0440\u043e\u0436\u0438\u0432\u0430\u043d\u0438\u044f",
     "agree_logistics_fixed": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u043c\u0430\u0440\u0448\u0440\u0443\u0442 \u0431\u0435\u0437 \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0439",
     "agree_logistics_change": "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0435 \u043c\u0430\u0440\u0448\u0440\u0443\u0442\u0430",
+    "deleted_at": "\u0423\u0434\u0430\u043b\u0435\u043d\u0430",
+}
+
+LABELS_MUNI = {
+    "id": "ID",
+    "created_at": T["th_date"],
+    "fio": "\u0424\u0418\u041e",
+    "federal_district": "\u0424\u0435\u0434\u0435\u0440\u0430\u043b\u044c\u043d\u044b\u0439 \u043e\u043a\u0440\u0443\u0433",
+    "region": "\u0420\u0435\u0433\u0438\u043e\u043d",
+    "city": "\u0413\u043e\u0440\u043e\u0434",
+    "workplace": "\u041c\u0435\u0441\u0442\u043e \u0440\u0430\u0431\u043e\u0442\u044b",
+    "position": "\u0414\u043e\u043b\u0436\u043d\u043e\u0441\u0442\u044c",
+    "birth_date": "\u0414\u0430\u0442\u0430 \u0440\u043e\u0436\u0434\u0435\u043d\u0438\u044f",
+    "snils": "\u0421\u041d\u0418\u041b\u0421",
+    "inn": "\u0418\u041d\u041d",
+    "phone": T["th_phone"],
+    "email": "E-mail",
+    "stream": T["stream"],
+    "address": "\u0410\u0434\u0440\u0435\u0441 \u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u0438",
+    "passport_series": "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u0441\u0435\u0440\u0438\u044f",
+    "passport_number": "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u043d\u043e\u043c\u0435\u0440",
+    "passport_issued": "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d",
+    "deleted_at": "\u0423\u0434\u0430\u043b\u0435\u043d\u0430",
 }
 
 JS_I18N = json.dumps(T, ensure_ascii=True)
 JS_LABELS = json.dumps(LABELS, ensure_ascii=True)
 JS_LABELS_INFO = json.dumps(LABELS_INFO, ensure_ascii=True)
+JS_LABELS_MUNI = json.dumps(LABELS_MUNI, ensure_ascii=True)
 
 CSS = r"""
 @import url("https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap");
@@ -192,9 +233,12 @@ input,select{width:100%;padding:11px 12px;border:1px solid rgba(34,63,154,.18);b
 .btn-navy{background:var(--navy);color:#fff}
 .btn-gold{background:var(--gold);color:#fff}
 .btn-ghost{background:transparent;color:var(--navy);border:1px solid rgba(34,63,154,.2)}
+.btn-danger{background:#9a2233;color:#fff}
 .btn-on{background:var(--navy);color:#fff}
 .btn-off{background:#fff;color:var(--navy);border:1px solid rgba(34,63,154,.2)}
 .err{color:#9a2233;font-size:13px;min-height:18px}
+.form-pick{min-width:min(420px,100%)}
+.form-pick label{margin-bottom:6px;color:var(--navy);letter-spacing:.04em;text-transform:uppercase;font-size:11px}
 .top{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
 .filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr auto;gap:10px;padding:16px;margin-bottom:14px}
 .table-wrap{overflow:auto}
@@ -244,9 +288,16 @@ html = f"""<!DOCTYPE html>
         <h1 id="page-title">{eh(T['title_apply'])}</h1>
         <p id="count-line"></p>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-on" id="form-apply" type="button">{eh(T['form1'])}</button>
-        <button class="btn btn-off" id="form-info" type="button">{eh(T['form2'])}</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+        <div class="form-pick">
+          <label for="form-select">{eh(T['form_pick'])}</label>
+          <select id="form-select">
+            <option value="apply">{eh(T['form_apply'])}</option>
+            <option value="info">{eh(T['form_info'])}</option>
+            <option value="muni">{eh(T['form_muni'])}</option>
+          </select>
+        </div>
+        <button class="btn btn-off" id="trash-btn" type="button">{eh(T['trash'])}</button>
         <button class="btn btn-gold" id="excel-btn" type="button">{eh(T['excel'])}</button>
         <button class="btn btn-navy" id="consents-btn" type="button">{eh(T['consents'])}</button>
         <button class="btn btn-ghost" id="logout-btn" type="button">{eh(T['logout'])}</button>
@@ -301,7 +352,9 @@ html = f"""<!DOCTYPE html>
   var T = {JS_I18N};
   var LABELS = {JS_LABELS};
   var LABELS_INFO = {JS_LABELS_INFO};
-  var state = {{ page:1, sort:"created_at", order:"desc", form:"apply" }};
+  var LABELS_MUNI = {JS_LABELS_MUNI};
+  var FORMS = ["apply","info","muni"];
+  var state = {{ page:1, sort:"created_at", order:"desc", form:"apply", trash:false }};
   var loadSeq = 0;
   var ignoreFilterChange = false;
   var loginView = document.getElementById("login-view");
@@ -318,6 +371,7 @@ html = f"""<!DOCTYPE html>
     p.set("order", state.order);
     p.set("page", String(state.page));
     p.set("limit", "50");
+    if (state.trash) p.set("trashed", "1");
     return p.toString();
   }}
   function fmtDate(s){{
@@ -347,7 +401,7 @@ html = f"""<!DOCTYPE html>
     appView.classList.remove("hidden");
     try {{
       var saved = sessionStorage.getItem("mshk-admin-form");
-      if (saved === "info" || saved === "apply") state.form = saved;
+      if (FORMS.indexOf(saved) >= 0) state.form = saved;
     }} catch (e) {{}}
     setForm(state.form, true);
   }}
@@ -356,6 +410,37 @@ html = f"""<!DOCTYPE html>
     loginView.classList.remove("hidden");
   }}
   function isInfo(){{ return state.form === "info"; }}
+  function isMuni(){{ return state.form === "muni"; }}
+  function isTrash(){{ return !!state.trash; }}
+  function pageTitle(){{
+    if (isTrash()) {{
+      if (isInfo()) return T.title_trash_info;
+      if (isMuni()) return T.title_trash_muni;
+      return T.title_trash_apply;
+    }}
+    if (isInfo()) return T.title_info;
+    if (isMuni()) return T.title_muni;
+    return T.title_apply;
+  }}
+  function listUrl(){{
+    if (isInfo()) return "/admin/api/participants";
+    if (isMuni()) return "/admin/api/municipal";
+    return "/admin/api/applications";
+  }}
+  function itemUrl(id){{ return listUrl() + "/" + id; }}
+  function syncChrome(){{
+    document.getElementById("form-select").value = state.form;
+    document.getElementById("trash-btn").className = "btn " + (isTrash() ? "btn-on" : "btn-off");
+    document.getElementById("page-title").textContent = pageTitle();
+    document.getElementById("f-q").placeholder = isMuni() ? T.search_muni : (isInfo() ? T.search_info : T.search);
+    document.getElementById("f-gender-wrap").style.display = (isInfo() || isMuni()) ? "none" : "";
+    var countrySel = document.getElementById("f-country");
+    if (countrySel && countrySel.options[0]) {{
+      countrySel.options[0].textContent = (isMuni() ? T.region : T.country) + ": " + T.all;
+    }}
+    document.getElementById("consents-btn").style.display = (isInfo() || isTrash()) ? "none" : "";
+    document.getElementById("excel-btn").style.display = isTrash() ? "none" : "";
+  }}
   function clearFilters(){{
     ignoreFilterChange = true;
     document.getElementById("f-q").value = "";
@@ -367,19 +452,14 @@ html = f"""<!DOCTYPE html>
     ignoreFilterChange = false;
   }}
   function setForm(form, skipReset){{
-    var next = form === "info" ? "info" : "apply";
+    var next = FORMS.indexOf(form) >= 0 ? form : "apply";
     if (!skipReset && next === state.form) return;
     state.form = next;
     try {{ sessionStorage.setItem("mshk-admin-form", state.form); }} catch (e) {{}}
-    document.getElementById("form-apply").className = "btn " + (isInfo() ? "btn-off" : "btn-on");
-    document.getElementById("form-info").className = "btn " + (isInfo() ? "btn-on" : "btn-off");
-    document.getElementById("page-title").textContent = isInfo() ? T.title_info : T.title_apply;
-    document.getElementById("f-q").placeholder = isInfo() ? T.search_info : T.search;
-    document.getElementById("f-gender-wrap").style.display = isInfo() ? "none" : "";
-    document.getElementById("consents-btn").style.display = isInfo() ? "none" : "";
+    syncChrome();
     if (!skipReset) {{
       state.page = 1;
-      state.sort = "created_at";
+      state.sort = isTrash() ? "deleted_at" : "created_at";
       state.order = "desc";
       clearFilters();
       closeCard();
@@ -392,9 +472,11 @@ html = f"""<!DOCTYPE html>
   }}
   function renderHead(){{
     var head = document.getElementById("thead");
-    var cols = isInfo()
-      ? [["id", T.th_id],["created_at", T.th_date],["fio_latin", T.th_fio],["meal_type", T.th_meal],["depart_country", T.th_country],["depart_city", T.th_city],["visa_needed", T.th_visa],["stream", T.th_stream]]
-      : [["id", T.th_id],["created_at", T.th_date],["fio_latin", T.th_fio],["email", T.th_email],["phone", T.th_phone],["country", T.th_country],["org_name", T.th_org],["stream", T.th_stream]];
+    var cols;
+    if (isInfo()) cols = [["id", T.th_id],["created_at", T.th_date],["fio_latin", T.th_fio],["meal_type", T.th_meal],["depart_country", T.th_country],["depart_city", T.th_city],["visa_needed", T.th_visa],["stream", T.th_stream]];
+    else if (isMuni()) cols = [["id", T.th_id],["created_at", T.th_date],["fio", T.th_fio],["email", T.th_email],["phone", T.th_phone],["region", T.th_region],["workplace", T.th_work],["stream", T.th_stream]];
+    else cols = [["id", T.th_id],["created_at", T.th_date],["fio_latin", T.th_fio],["email", T.th_email],["phone", T.th_phone],["country", T.th_country],["org_name", T.th_org],["stream", T.th_stream]];
+    if (isTrash()) cols.push(["deleted_at", T.th_deleted]);
     var html = "<tr>";
     cols.forEach(function(c){{
       html += '<th data-sort="' + c[0] + '" data-label="' + c[1] + '">' + c[1] + "</th>";
@@ -408,8 +490,8 @@ html = f"""<!DOCTYPE html>
     api("/admin/api/meta?form=" + form).then(function(m){{
       if (seq !== loadSeq || state.form !== form) return;
       fillSelect("f-stream", m.streams, T.stream);
-      fillSelect("f-country", m.countries, T.country);
-      if (form !== "info") fillSelect("f-gender", m.genders, T.gender);
+      fillSelect("f-country", m.countries, form === "muni" ? T.region : T.country);
+      if (form === "apply") fillSelect("f-gender", m.genders, T.gender);
     }}).catch(function(){{}});
   }}
   function fillSelect(id, items, label){{
@@ -432,6 +514,7 @@ html = f"""<!DOCTYPE html>
     seq = seq || loadSeq;
     var form = state.form;
     var info = form === "info";
+    var muni = form === "muni";
     document.querySelectorAll("th[data-sort]").forEach(function(th){{
       var key = th.getAttribute("data-sort");
       var base = th.getAttribute("data-label") || th.textContent.replace(/ [\\u25B2\\u25BC]$/, "");
@@ -440,18 +523,18 @@ html = f"""<!DOCTYPE html>
       if (state.sort === key) mark = state.order === "asc" ? " \\u25B2" : " \\u25BC";
       th.textContent = base + mark;
     }});
-    var url = info ? "/admin/api/participants?" : "/admin/api/applications?";
+    var url = listUrl() + "?";
     api(url + qs()).then(function(data){{
       if (seq !== loadSeq || state.form !== form) return;
       var tb = document.getElementById("tbody");
       tb.innerHTML = "";
-      document.getElementById("count-line").textContent = (data.total || 0) + " " + (info ? T.count_info : T.count);
+      document.getElementById("count-line").textContent = (data.total || 0) + " " + (isTrash() ? T.count_trash : (info ? T.count_info : T.count));
       document.getElementById("page-line").textContent = data.page + " / " + data.pages;
       document.getElementById("prev-btn").disabled = data.page <= 1;
       document.getElementById("next-btn").disabled = data.page >= data.pages;
       if (!data.items.length){{
         var tr = document.createElement("tr");
-        tr.innerHTML = '<td colspan="8">' + (info ? T.empty_info : T.empty) + "</td>";
+        tr.innerHTML = '<td colspan="9">' + (isTrash() ? T.empty_trash : (info ? T.empty_info : T.empty)) + "</td>";
         tb.appendChild(tr);
         return;
       }}
@@ -468,6 +551,16 @@ html = f"""<!DOCTYPE html>
             "<td>" + esc(it.depart_city||"") + "</td>" +
             "<td>" + esc(it.visa_needed||"") + "</td>" +
             "<td>" + esc(it.stream||"") + "</td>";
+        }} else if (muni) {{
+          tr.innerHTML =
+            "<td>" + it.id + "</td>" +
+            "<td>" + fmtDate(it.created_at) + "</td>" +
+            "<td><b>" + esc(it.fio||"") + "</b></td>" +
+            "<td>" + esc(it.email||"") + "</td>" +
+            "<td>" + esc(it.phone||"") + "</td>" +
+            "<td>" + esc(it.federal_district||"") + "<br>" + esc(it.region||"") + "<br>" + esc(it.city||"") + "</td>" +
+            "<td>" + esc(it.workplace||"") + "</td>" +
+            "<td>" + esc(it.stream||"") + "</td>";
         }} else {{
           tr.innerHTML =
             "<td>" + it.id + "</td>" +
@@ -479,6 +572,7 @@ html = f"""<!DOCTYPE html>
             "<td>" + esc(it.org_name||"") + "</td>" +
             "<td>" + esc(it.stream||"") + "</td>";
         }}
+        if (isTrash()) tr.innerHTML += "<td>" + fmtDate(it.deleted_at) + "</td>";
         tr.addEventListener("click", function(){{ openCard(it.id); }});
         tb.appendChild(tr);
       }});
@@ -527,25 +621,35 @@ html = f"""<!DOCTYPE html>
   }}
   function openCard(id){{
     var form = state.form;
-    var url = form === "info" ? "/admin/api/participants/" : "/admin/api/applications/";
-    api(url + id).then(function(it){{
+    api(itemUrl(id)).then(function(it){{
       if (state.form !== form) return;
-      document.getElementById("card-title").textContent = it.fio_latin || ("#" + it.id);
-      var labels = form === "info" ? LABELS_INFO : LABELS;
+      document.getElementById("card-title").textContent = it.fio || it.fio_latin || ("#" + it.id);
+      var labels = form === "info" ? LABELS_INFO : (form === "muni" ? LABELS_MUNI : LABELS);
       var skip = {{payload_raw:1, has_portfolio:1, has_consent:1, portfolio_url:1, consent_url:1}};
+      if (!isTrash()) skip.deleted_at = 1;
       var html = "";
       Object.keys(labels).forEach(function(k){{
         if (skip[k]) return;
-        html += '<div class="kv"><b>' + esc(labels[k]) + "</b><span>" + esc(fmtVal(it[k])) + "</span></div>";
+        html += '<div class="kv"><b>' + esc(labels[k]) + "</b><span>" + esc(fmtVal(k === "deleted_at" ? fmtDate(it[k]) : it[k])) + "</span></div>";
       }});
       if (form !== "info") {{
         html += '<div class="kv"><b>' + T.files + "</b><span>";
-        if (it.has_portfolio) html += '<button class="btn btn-navy" type="button" data-dl="/admin/api/applications/' + id + '/file/portfolio" data-name="portfolio.pdf">' + T.dl_portfolio + "</button> ";
-        else html += T.portfolio + ": " + T.no_file + "<br>";
-        if (it.has_consent) html += '<button class="btn btn-navy" type="button" data-dl="/admin/api/applications/' + id + '/file/consent" data-name="consent.pdf">' + T.dl_consent + "</button>";
+        if (form === "apply") {{
+          if (it.has_portfolio) html += '<button class="btn btn-navy" type="button" data-dl="/admin/api/applications/' + id + '/file/portfolio" data-name="portfolio.pdf">' + T.dl_portfolio + "</button> ";
+          else html += T.portfolio + ": " + T.no_file + "<br>";
+        }}
+        var consentPath = form === "muni" ? ("/admin/api/municipal/" + id + "/file/consent") : ("/admin/api/applications/" + id + "/file/consent");
+        if (it.has_consent) html += '<button class="btn btn-navy" type="button" data-dl="' + consentPath + '" data-name="consent.pdf">' + T.dl_consent + "</button>";
         else html += T.consent + ": " + T.no_file;
         html += "</span></div>";
       }}
+      html += '<div class="kv"><b></b><span>';
+      if (isTrash()) {{
+        html += '<button class="btn btn-navy" type="button" data-restore="' + id + '">' + T.restore + "</button>";
+      }} else {{
+        html += '<button class="btn btn-danger" type="button" data-trash="' + id + '">' + T.delete + "</button>";
+      }}
+      html += "</span></div>";
       document.getElementById("card-body").innerHTML = html;
       document.getElementById("drawer").classList.add("open");
       document.getElementById("drawer-bg").classList.add("show");
@@ -576,20 +680,55 @@ html = f"""<!DOCTYPE html>
     fetch("/admin/api/logout", {{method:"POST", credentials:"include"}}).finally(showLogin);
   }};
   document.getElementById("excel-btn").onclick = function(){{
-    var path = isInfo() ? "/admin/api/participants/export.xlsx?" : "/admin/api/applications/export.xlsx?";
-    var name = isInfo() ? "mashuk_uchastniki.xlsx" : "mashuk_zayavki.xlsx";
+    var path = listUrl() + "/export.xlsx?";
+    var name = isMuni() ? "mashuk_municipality.xlsx" : (isInfo() ? "mashuk_uchastniki.xlsx" : "mashuk_zayavki.xlsx");
     saveBlob(path + qs(), name);
   }};
   document.getElementById("consents-btn").onclick = function(){{
-    saveBlob("/admin/api/consents.zip?" + qs(), "mashuk_soglasia.zip");
+    var zip = isMuni() ? "/admin/api/municipal/consents.zip?" : "/admin/api/consents.zip?";
+    saveBlob(zip + qs(), isMuni() ? "mashuk_muni_soglasia.zip" : "mashuk_soglasia.zip");
   }};
   document.getElementById("card-body").addEventListener("click", function(e){{
     var b = e.target.closest("[data-dl]");
-    if (!b) return;
-    saveBlob(b.getAttribute("data-dl"), b.getAttribute("data-name") || "file");
+    if (b) {{
+      saveBlob(b.getAttribute("data-dl"), b.getAttribute("data-name") || "file");
+      return;
+    }}
+    var del = e.target.closest("[data-trash]");
+    if (del) {{
+      if (!confirm(T.trash_confirm)) return;
+      var id = del.getAttribute("data-trash");
+      api(itemUrl(id) + "/trash", {{method:"POST"}}).then(function(){{
+        closeCard();
+        loadList();
+        loadMeta(loadSeq);
+      }}).catch(function(){{ alert(T.err_file); }});
+      return;
+    }}
+    var res = e.target.closest("[data-restore]");
+    if (res) {{
+      if (!confirm(T.restore_confirm)) return;
+      var rid = res.getAttribute("data-restore");
+      api(itemUrl(rid) + "/restore", {{method:"POST"}}).then(function(){{
+        closeCard();
+        loadList();
+        loadMeta(loadSeq);
+      }}).catch(function(){{ alert(T.err_file); }});
+    }}
   }});
-  document.getElementById("form-apply").onclick = function(){{ setForm("apply"); }};
-  document.getElementById("form-info").onclick = function(){{ setForm("info"); }};
+  document.getElementById("form-select").onchange = function(){{ setForm(this.value); }};
+  document.getElementById("trash-btn").onclick = function(){{
+    state.trash = !state.trash;
+    state.page = 1;
+    state.sort = state.trash ? "deleted_at" : "created_at";
+    state.order = "desc";
+    syncChrome();
+    renderHead();
+    closeCard();
+    loadSeq += 1;
+    loadMeta(loadSeq);
+    loadList(loadSeq);
+  }};
   ["f-stream","f-country","f-gender","f-from","f-to"].forEach(function(id){{
     document.getElementById(id).addEventListener("change", function(){{
       if (ignoreFilterChange) return;

@@ -1,0 +1,62 @@
+<!-- Tilda T123. Page: municipal application.
+     DELETE the old iframe block, then paste this.
+     Record: do NOT stretch. Keep standard page width.
+     Height: 0 / Auto. Zero extra padding. -->
+<div id="mshk-m-clip" style="box-sizing:border-box;width:100%;max-width:1200px;height:100vh;overflow:hidden;background:#fafafa;margin:0 auto;padding:0;">
+  <iframe id="mshk-m-frame" src="https://zuevpu-mashuk-forms-e759.twc1.net/muni" title="Mashuk municipal apply" loading="eager" scrolling="yes" allow="clipboard-write" style="display:block;width:100%;max-width:100%;height:100vh;border:0;background:#fafafa;pointer-events:auto;touch-action:manipulation;margin:0;padding:0;"></iframe>
+</div>
+<script>
+(function () {
+  var clip = document.getElementById("mshk-m-clip");
+  var frame = document.getElementById("mshk-m-frame");
+  if (!clip || !frame) return;
+  var old = document.getElementById("mshk-muni-wrap");
+  if (old) old.style.cssText = "display:none!important;height:0!important;overflow:hidden!important";
+  var lastH = 0;
+  var busy = 0;
+  function recOf(el) {
+    var n = el;
+    for (var i = 0; i < 16 && n; i++) {
+      var id = n.id ? String(n.id) : "";
+      var cn = n.className ? String(n.className) : "";
+      if (id.indexOf("rec") === 0 || cn.indexOf("t-rec") !== -1) return n;
+      n = n.parentElement;
+    }
+    return el.parentElement;
+  }
+  function cap() {
+    var vh = window.innerHeight || 640;
+    var rec = recOf(clip);
+    var top = 0;
+    try {
+      if (rec) top = rec.getBoundingClientRect().top;
+    } catch (e) {}
+    var remain = Math.round(vh - Math.max(0, top) - 2);
+    return Math.max(520, remain);
+  }
+  function pin() {
+    if (busy) return;
+    busy = 1;
+    var h = cap();
+    if (!(lastH && Math.abs(h - lastH) < 8)) {
+      lastH = h;
+      var px = h + "px";
+      clip.style.cssText = "box-sizing:border-box;width:100%;max-width:100%;height:" + px + ";max-height:" + px + ";min-height:" + px + ";overflow:hidden;background:#fafafa;line-height:normal;margin:0 auto;padding:0;";
+      frame.style.cssText = "display:block;width:100%;max-width:100%;height:" + px + ";max-height:" + px + ";border:0;background:#fafafa;pointer-events:auto;touch-action:manipulation;margin:0;padding:0;";
+      frame.setAttribute("scrolling", "yes");
+    }
+    busy = 0;
+  }
+  pin();
+  setTimeout(pin, 200);
+  setTimeout(pin, 800);
+  window.addEventListener("orientationchange", function () {
+    lastH = 0;
+    setTimeout(pin, 300);
+  });
+  window.addEventListener("resize", function () {
+    lastH = 0;
+    pin();
+  });
+})();
+</script>

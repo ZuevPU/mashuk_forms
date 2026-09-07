@@ -43,6 +43,7 @@ SORTABLE = {
     "city": "city",
     "org_name": "org_name",
     "stream": "stream",
+    "deleted_at": "deleted_at",
 }
 
 SORTABLE_INFO = {
@@ -54,6 +55,20 @@ SORTABLE_INFO = {
     "depart_country": "depart_country",
     "depart_city": "depart_city",
     "visa_needed": "visa_needed",
+    "deleted_at": "deleted_at",
+}
+
+SORTABLE_MUNI = {
+    "id": "id",
+    "created_at": "created_at",
+    "fio": "fio",
+    "email": "email",
+    "phone": "phone",
+    "region": "region",
+    "city": "city",
+    "workplace": "workplace",
+    "stream": "stream",
+    "deleted_at": "deleted_at",
 }
 
 EXCEL_COLUMNS = [
@@ -119,14 +134,12 @@ INFO_EXCEL_COLUMNS = [
     ("id_doc_series", "\u0421\u0435\u0440\u0438\u044f \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430"),
     ("id_doc_number", "\u041d\u043e\u043c\u0435\u0440 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430"),
     ("id_doc_issued", "\u0414\u0430\u0442\u0430 \u0432\u044b\u0434\u0430\u0447\u0438"),
-    ("id_doc_valid_from", "\u0421\u0440\u043e\u043a \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044f \u0441"),
     ("id_doc_valid_to", "\u0421\u0440\u043e\u043a \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044f"),
     ("id_doc_issuer", "\u041a\u0435\u043c \u0432\u044b\u0434\u0430\u043d"),
     ("entry_doc_name", "\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442 \u0434\u043b\u044f \u0432\u044a\u0435\u0437\u0434\u0430 \u0432 \u0420\u0424"),
     ("entry_doc_series", "\u0412\u044a\u0435\u0437\u0434: \u0441\u0435\u0440\u0438\u044f"),
     ("entry_doc_number", "\u0412\u044a\u0435\u0437\u0434: \u043d\u043e\u043c\u0435\u0440"),
     ("entry_doc_issued", "\u0412\u044a\u0435\u0437\u0434: \u0434\u0430\u0442\u0430 \u0432\u044b\u0434\u0430\u0447\u0438"),
-    ("entry_doc_valid_from", "\u0412\u044a\u0435\u0437\u0434: \u0441\u0440\u043e\u043a \u0441"),
     ("entry_doc_valid_to", "\u0412\u044a\u0435\u0437\u0434: \u0441\u0440\u043e\u043a \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044f"),
     ("entry_doc_issuer", "\u0412\u044a\u0435\u0437\u0434: \u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d"),
     ("stream", "\u041f\u043e\u0442\u043e\u043a"),
@@ -137,8 +150,6 @@ INFO_EXCEL_COLUMNS = [
     ("visa_needed", "\u0412\u0438\u0437\u0430 \u0432 \u0420\u0424"),
     ("visa_current", "\u0414\u0435\u0439\u0441\u0442\u0432\u0443\u044e\u0449\u0430\u044f \u0432\u0438\u0437\u0430"),
     ("visa_status", "\u0421\u0442\u0430\u0442\u0443\u0441 \u043e\u0444\u043e\u0440\u043c\u043b\u0435\u043d\u0438\u044f \u0432\u0438\u0437\u044b"),
-    ("transit_visa", "\u0422\u0440\u0430\u043d\u0437\u0438\u0442\u043d\u0430\u044f \u0432\u0438\u0437\u0430"),
-    ("agree_tickets", "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0431\u0438\u043b\u0435\u0442\u044b \u0431\u0435\u0437 \u0432\u043e\u0437\u0432\u0440\u0430\u0442\u0430"),
     ("agree_participate", "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0443\u0447\u0430\u0441\u0442\u0438\u0435 \u0432 \u0441\u0435\u043c\u0438\u043d\u0430\u0440\u0435"),
     ("agree_notice", "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0443\u0432\u0435\u0434\u043e\u043c\u043b\u0435\u043d\u0438\u0435 \u0437\u0430 12 \u0434\u043d\u0435\u0439"),
     ("agree_truth", "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0434\u043e\u0441\u0442\u043e\u0432\u0435\u0440\u043d\u043e\u0441\u0442\u044c \u0441\u0432\u0435\u0434\u0435\u043d\u0438\u0439"),
@@ -147,6 +158,28 @@ INFO_EXCEL_COLUMNS = [
     ("agree_logistics_city", "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u043b\u043e\u0433\u0438\u0441\u0442\u0438\u043a\u0430 \u0438\u0437 \u0433\u043e\u0440\u043e\u0434\u0430 \u043f\u0440\u043e\u0436\u0438\u0432\u0430\u043d\u0438\u044f"),
     ("agree_logistics_fixed", "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u043c\u0430\u0440\u0448\u0440\u0443\u0442 \u0431\u0435\u0437 \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0439"),
     ("agree_logistics_change", "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435: \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0435 \u043c\u0430\u0440\u0448\u0440\u0443\u0442\u0430"),
+]
+
+MUNI_EXCEL_COLUMNS = [
+    ("id", "ID"),
+    ("created_at", "\u0414\u0430\u0442\u0430 \u043f\u043e\u0434\u0430\u0447\u0438"),
+    ("fio", "\u0424\u0418\u041e"),
+    ("federal_district", "\u0424\u0435\u0434\u0435\u0440\u0430\u043b\u044c\u043d\u044b\u0439 \u043e\u043a\u0440\u0443\u0433"),
+    ("region", "\u0420\u0435\u0433\u0438\u043e\u043d"),
+    ("city", "\u0413\u043e\u0440\u043e\u0434"),
+    ("workplace", "\u041c\u0435\u0441\u0442\u043e \u0440\u0430\u0431\u043e\u0442\u044b"),
+    ("position", "\u0414\u043e\u043b\u0436\u043d\u043e\u0441\u0442\u044c"),
+    ("birth_date", "\u0414\u0430\u0442\u0430 \u0440\u043e\u0436\u0434\u0435\u043d\u0438\u044f"),
+    ("snils", "\u0421\u041d\u0418\u041b\u0421"),
+    ("inn", "\u0418\u041d\u041d"),
+    ("phone", "\u0422\u0435\u043b\u0435\u0444\u043e\u043d"),
+    ("email", "E-mail"),
+    ("stream", "\u041f\u043e\u0442\u043e\u043a"),
+    ("address", "\u0410\u0434\u0440\u0435\u0441 \u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u0438"),
+    ("passport_series", "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u0441\u0435\u0440\u0438\u044f"),
+    ("passport_number", "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u043d\u043e\u043c\u0435\u0440"),
+    ("passport_issued", "\u041f\u0430\u0441\u043f\u043e\u0440\u0442: \u043a\u0435\u043c \u0432\u044b\u0434\u0430\u043d"),
+    ("consent_url", "\u0421\u043e\u0433\u043b\u0430\u0441\u0438\u0435 (\u0441\u0441\u044b\u043b\u043a\u0430)"),
 ]
 
 
@@ -336,7 +369,7 @@ def send_download(path: Path, name: str) -> Response:
 
 
 def safe_fio_name(row: dict) -> str:
-    raw = str(row.get("fio_latin") or row.get("fio_ru") or "").strip()
+    raw = str(row.get("fio") or row.get("fio_latin") or row.get("fio_ru") or "").strip()
     raw = re.sub(r"[^\w\s\-]+", "", raw, flags=re.UNICODE)
     raw = re.sub(r"\s+", "_", raw).strip("._")
     return raw or ("id_%s" % row.get("id"))
@@ -368,6 +401,23 @@ def db():
     if not url:
         raise HTTPException(500, "DATABASE_URL is not set")
     return psycopg.connect(url)
+
+
+def ensure_soft_delete_columns() -> None:
+    url = os.environ.get("DATABASE_URL", "").strip()
+    if not url:
+        return
+    with psycopg.connect(url) as conn:
+        with conn.cursor() as cur:
+            for table in ("seminar_applications", "participant_details", "municipal_applications"):
+                cur.execute(
+                    f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ"
+                )
+                cur.execute(
+                    f"CREATE INDEX IF NOT EXISTS {table}_deleted_idx ON {table} (deleted_at)"
+                )
+        conn.commit()
+    log.info("soft-delete columns ready")
 
 
 def as_dicts(cur):
@@ -417,11 +467,12 @@ def parse_filters(request: Request):
         "order": "ASC" if (q.get("order") or "").lower() == "asc" else "DESC",
         "page": _int_param(q.get("page"), 1, 1, 100000),
         "limit": _int_param(q.get("limit"), 50, 10, 100),
+        "trashed": (q.get("trashed") or "").strip().lower() in ("1", "true", "yes"),
     }
 
 
 def where_sql(f):
-    clauses = ["TRUE"]
+    clauses = ["deleted_at IS NOT NULL" if f.get("trashed") else "deleted_at IS NULL"]
     args = []
     if f["q"]:
         like = "%" + f["q"] + "%"
@@ -462,11 +513,12 @@ def parse_info_filters(request: Request):
         "order": "ASC" if (q.get("order") or "").lower() == "asc" else "DESC",
         "page": _int_param(q.get("page"), 1, 1, 100000),
         "limit": _int_param(q.get("limit"), 50, 10, 100),
+        "trashed": (q.get("trashed") or "").strip().lower() in ("1", "true", "yes"),
     }
 
 
 def where_info_sql(f):
-    clauses = ["TRUE"]
+    clauses = ["deleted_at IS NOT NULL" if f.get("trashed") else "deleted_at IS NULL"]
     args = []
     if f["q"]:
         like = "%" + f["q"] + "%"
@@ -491,6 +543,58 @@ def where_info_sql(f):
         clauses.append("created_at::date <= %s")
         args.append(f["date_to"])
     return " AND ".join(clauses), args
+
+
+def parse_muni_filters(request: Request):
+    q = request.query_params
+    return {
+        "q": (q.get("q") or "").strip(),
+        "stream": (q.get("stream") or "").strip(),
+        "country": (q.get("country") or "").strip(),
+        "date_from": (q.get("date_from") or "").strip(),
+        "date_to": (q.get("date_to") or "").strip(),
+        "sort": SORTABLE_MUNI.get(q.get("sort") or "created_at", "created_at"),
+        "order": "ASC" if (q.get("order") or "").lower() == "asc" else "DESC",
+        "page": _int_param(q.get("page"), 1, 1, 100000),
+        "limit": _int_param(q.get("limit"), 50, 10, 100),
+        "trashed": (q.get("trashed") or "").strip().lower() in ("1", "true", "yes"),
+    }
+
+
+def where_muni_sql(f):
+    clauses = ["deleted_at IS NOT NULL" if f.get("trashed") else "deleted_at IS NULL"]
+    args = []
+    if f["q"]:
+        like = "%" + f["q"] + "%"
+        clauses.append(
+            "("
+            "fio ILIKE %s OR email ILIKE %s OR phone ILIKE %s "
+            "OR region ILIKE %s OR city ILIKE %s OR workplace ILIKE %s "
+            "OR federal_district ILIKE %s OR position ILIKE %s"
+            ")"
+        )
+        args.extend([like] * 8)
+    if f["stream"]:
+        clauses.append("stream = %s")
+        args.append(f["stream"])
+    if f["country"]:
+        clauses.append("region ILIKE %s")
+        args.append("%" + f["country"] + "%")
+    if f["date_from"]:
+        clauses.append("created_at::date >= %s")
+        args.append(f["date_from"])
+    if f["date_to"]:
+        clauses.append("created_at::date <= %s")
+        args.append(f["date_to"])
+    return " AND ".join(clauses), args
+
+
+def muni_file_url(request: Request, app_id: int) -> str:
+    return (
+        public_origin(request)
+        + "/admin/api/municipal/%s/file/consent?t=%s"
+        % (int(app_id), file_token("consent", int(app_id)))
+    )
 
 
 router = APIRouter()
@@ -541,27 +645,37 @@ def me(mashuk_admin: Optional[str] = Cookie(default=None)):
 def meta(request: Request, mashuk_admin: Optional[str] = Cookie(default=None)):
     require_admin(mashuk_admin)
     form = (request.query_params.get("form") or "apply").strip().lower()
-    table = "participant_details" if form == "info" else "seminar_applications"
-    country_col = "depart_country" if form == "info" else "country"
+    tables = {
+        "info": "participant_details",
+        "muni": "municipal_applications",
+        "apply": "seminar_applications",
+    }
+    table = tables.get(form, "seminar_applications")
+    if form == "info":
+        country_col = "depart_country"
+    elif form == "muni":
+        country_col = "region"
+    else:
+        country_col = "country"
     with db() as conn:
         with conn.cursor() as cur:
-            cur.execute(f"SELECT COUNT(*) FROM {table}")
+            cur.execute(f"SELECT COUNT(*) FROM {table} WHERE deleted_at IS NULL")
             total = cur.fetchone()[0]
             cur.execute(
                 f"SELECT DISTINCT stream FROM {table} "
-                "WHERE stream IS NOT NULL AND stream <> '' ORDER BY 1"
+                "WHERE deleted_at IS NULL AND stream IS NOT NULL AND stream <> '' ORDER BY 1"
             )
             streams = [r[0] for r in cur.fetchall()]
             cur.execute(
                 f"SELECT DISTINCT {country_col} FROM {table} "
-                f"WHERE {country_col} IS NOT NULL AND {country_col} <> '' ORDER BY 1"
+                f"WHERE deleted_at IS NULL AND {country_col} IS NOT NULL AND {country_col} <> '' ORDER BY 1"
             )
             countries = [r[0] for r in cur.fetchall()]
             genders = []
-            if form != "info":
+            if form == "apply":
                 cur.execute(
                     "SELECT DISTINCT gender FROM seminar_applications "
-                    "WHERE gender IS NOT NULL AND gender <> '' ORDER BY 1"
+                    "WHERE deleted_at IS NULL AND gender IS NOT NULL AND gender <> '' ORDER BY 1"
                 )
                 genders = [r[0] for r in cur.fetchall()]
     return {
@@ -581,7 +695,7 @@ def list_applications(request: Request, mashuk_admin: Optional[str] = Cookie(def
     offset = (f["page"] - 1) * f["limit"]
     sql_count = f"SELECT COUNT(*) FROM seminar_applications WHERE {where}"
     sql = (
-        "SELECT id, created_at, fio_latin, fio_ru, email, phone, country, city, "
+        "SELECT id, created_at, deleted_at, fio_latin, fio_ru, email, phone, country, city, "
         "org_name, position, stream, gender, citizenship, "
         "(portfolio_path IS NOT NULL AND portfolio_path <> '') AS has_portfolio, "
         "(consent_path IS NOT NULL AND consent_path <> '') AS has_consent "
@@ -721,6 +835,41 @@ def get_application(
     return item
 
 
+def _set_deleted(table: str, item_id: int, trash: bool) -> dict:
+    if table not in ("seminar_applications", "participant_details", "municipal_applications"):
+        raise HTTPException(500, "bad table")
+    if trash:
+        sql = (
+            f"UPDATE {table} SET deleted_at = NOW() "
+            "WHERE id = %s AND deleted_at IS NULL RETURNING id"
+        )
+    else:
+        sql = (
+            f"UPDATE {table} SET deleted_at = NULL "
+            "WHERE id = %s AND deleted_at IS NOT NULL RETURNING id"
+        )
+    with db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql, (item_id,))
+            row = cur.fetchone()
+        conn.commit()
+    if not row:
+        raise HTTPException(404, "not found")
+    return {"ok": True, "id": item_id}
+
+
+@router.post("/api/applications/{app_id}/trash")
+def trash_application(app_id: int, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    return _set_deleted("seminar_applications", app_id, True)
+
+
+@router.post("/api/applications/{app_id}/restore")
+def restore_application(app_id: int, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    return _set_deleted("seminar_applications", app_id, False)
+
+
 @router.get("/api/applications/{app_id}/file/{kind}")
 def get_file(
     app_id: int,
@@ -794,8 +943,8 @@ def list_participants(request: Request, mashuk_admin: Optional[str] = Cookie(def
     offset = (f["page"] - 1) * f["limit"]
     sql_count = f"SELECT COUNT(*) FROM participant_details WHERE {where}"
     sql = (
-        "SELECT id, created_at, fio_latin, meal_type, stream, depart_country, "
-        "depart_city, visa_needed, transit_visa, return_ticket, baggage "
+        "SELECT id, created_at, deleted_at, fio_latin, meal_type, stream, depart_country, "
+        "depart_city, visa_needed, return_ticket, baggage "
         f"FROM participant_details WHERE {where} "
         f"ORDER BY {f['sort']} {f['order']} NULLS LAST "
         "LIMIT %s OFFSET %s"
@@ -847,4 +996,181 @@ def get_participant(item_id: int, mashuk_admin: Optional[str] = Cookie(default=N
     item = items[0]
     item.pop("payload_raw", None)
     return item
+
+
+@router.post("/api/participants/{item_id}/trash")
+def trash_participant(item_id: int, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    return _set_deleted("participant_details", item_id, True)
+
+
+@router.post("/api/participants/{item_id}/restore")
+def restore_participant(item_id: int, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    return _set_deleted("participant_details", item_id, False)
+
+
+@router.get("/api/municipal")
+def list_municipal(request: Request, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    f = parse_muni_filters(request)
+    where, args = where_muni_sql(f)
+    offset = (f["page"] - 1) * f["limit"]
+    sql_count = f"SELECT COUNT(*) FROM municipal_applications WHERE {where}"
+    sql = (
+        "SELECT id, created_at, deleted_at, fio, email, phone, federal_district, "
+        "region, city, workplace, position, stream, "
+        "(consent_path IS NOT NULL AND consent_path <> '') AS has_consent "
+        f"FROM municipal_applications WHERE {where} "
+        f"ORDER BY {f['sort']} {f['order']} NULLS LAST "
+        "LIMIT %s OFFSET %s"
+    )
+    with db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql_count, args)
+            total = cur.fetchone()[0]
+            cur.execute(sql, args + [f["limit"], offset])
+            items = as_dicts(cur)
+    return {
+        "items": items,
+        "total": total,
+        "page": f["page"],
+        "limit": f["limit"],
+        "pages": max(1, (total + f["limit"] - 1) // f["limit"]),
+        "sort": f["sort"],
+        "order": f["order"].lower(),
+    }
+
+
+@router.get("/api/municipal/export.xlsx")
+def export_municipal_xlsx(request: Request, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    f = parse_muni_filters(request)
+    where, args = where_muni_sql(f)
+    sql = (
+        f"SELECT * FROM municipal_applications WHERE {where} "
+        f"ORDER BY {f['sort']} {f['order']} NULLS LAST"
+    )
+    with db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql, args)
+            rows = as_dicts(cur)
+    for row in rows:
+        row["consent_url"] = (
+            muni_file_url(request, int(row["id"])) if row.get("consent_path") else ""
+        )
+    return _xlsx(
+        rows,
+        MUNI_EXCEL_COLUMNS,
+        "Municipality",
+        "mashuk_municipality.xlsx",
+        link_keys=("consent_url",),
+    )
+
+
+@router.get("/api/municipal/consents.zip")
+def export_municipal_consents(request: Request, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    f = parse_muni_filters(request)
+    where, args = where_muni_sql(f)
+    sql = (
+        "SELECT id, fio, consent_path FROM municipal_applications "
+        f"WHERE {where} AND consent_path IS NOT NULL AND consent_path <> '' "
+        f"ORDER BY {f['sort']} {f['order']} NULLS LAST"
+    )
+    with db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql, args)
+            rows = as_dicts(cur)
+    buf = BytesIO()
+    used = set()
+    added = 0
+    missing = []
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        for row in rows:
+            stored = row.get("consent_path") or ""
+            try:
+                path = find_upload(stored)
+            except HTTPException:
+                missing.append("%s\t%s" % (row.get("id"), Path(str(stored)).name))
+                continue
+            name = unique_name(
+                download_name(row, "consent", path.suffix.lower() or ".pdf"),
+                used,
+            )
+            zf.write(path, name)
+            added += 1
+        if missing:
+            zf.writestr("missing.txt", "id\tfile\n" + "\n".join(missing) + "\n")
+        if added == 0:
+            zf.writestr("README.txt", "consent files were not found on the server\n")
+    return Response(
+        content=buf.getvalue(),
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": 'attachment; filename="mashuk_muni_soglasia.zip"',
+            "Cache-Control": "no-store",
+        },
+    )
+
+
+@router.get("/api/municipal/{item_id}")
+def get_municipal(
+    item_id: int,
+    request: Request,
+    mashuk_admin: Optional[str] = Cookie(default=None),
+):
+    require_admin(mashuk_admin)
+    with db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM municipal_applications WHERE id = %s", (item_id,))
+            items = as_dicts(cur)
+    if not items:
+        raise HTTPException(404, "not found")
+    item = items[0]
+    item["has_consent"] = bool(item.get("consent_path"))
+    item["consent_url"] = muni_file_url(request, item_id) if item["has_consent"] else ""
+    item.pop("consent_path", None)
+    item.pop("payload_raw", None)
+    return item
+
+
+@router.post("/api/municipal/{item_id}/trash")
+def trash_municipal(item_id: int, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    return _set_deleted("municipal_applications", item_id, True)
+
+
+@router.post("/api/municipal/{item_id}/restore")
+def restore_municipal(item_id: int, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    return _set_deleted("municipal_applications", item_id, False)
+
+
+@router.get("/api/municipal/{item_id}/file/{kind}")
+def get_municipal_file(
+    item_id: int,
+    kind: str,
+    t: Optional[str] = None,
+    mashuk_admin: Optional[str] = Cookie(default=None),
+):
+    if kind != "consent":
+        raise HTTPException(404, "unknown file")
+    allow_file_access(kind, item_id, t, mashuk_admin)
+    with db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT consent_path, fio FROM municipal_applications WHERE id = %s",
+                (item_id,),
+            )
+            row = cur.fetchone()
+    if not row or not row[0]:
+        raise HTTPException(404, "file not found")
+    path = find_upload(row[0])
+    name = download_name(
+        {"id": item_id, "fio": row[1]},
+        kind,
+        path.suffix.lower() or ".pdf",
+    )
+    return send_download(path, name)
 

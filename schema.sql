@@ -48,6 +48,10 @@ CREATE INDEX IF NOT EXISTS seminar_applications_email_idx
 CREATE INDEX IF NOT EXISTS seminar_applications_created_idx
     ON seminar_applications (created_at DESC);
 
+ALTER TABLE seminar_applications ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+CREATE INDEX IF NOT EXISTS seminar_applications_deleted_idx
+    ON seminar_applications (deleted_at);
+
 CREATE TABLE IF NOT EXISTS participant_details (
     id                   BIGSERIAL PRIMARY KEY,
     created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -104,6 +108,10 @@ CREATE INDEX IF NOT EXISTS participant_details_created_idx
 CREATE INDEX IF NOT EXISTS participant_details_stream_idx
     ON participant_details (stream);
 
+ALTER TABLE participant_details ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+CREATE INDEX IF NOT EXISTS participant_details_deleted_idx
+    ON participant_details (deleted_at);
+
 ALTER TABLE participant_details ADD COLUMN IF NOT EXISTS gender TEXT;
 ALTER TABLE participant_details ADD COLUMN IF NOT EXISTS citizenship TEXT;
 ALTER TABLE participant_details ADD COLUMN IF NOT EXISTS other_citizenships TEXT;
@@ -120,3 +128,34 @@ ALTER TABLE participant_details ADD COLUMN IF NOT EXISTS agree_participate TEXT;
 ALTER TABLE participant_details ADD COLUMN IF NOT EXISTS agree_logistics_city TEXT;
 ALTER TABLE participant_details ADD COLUMN IF NOT EXISTS agree_logistics_fixed TEXT;
 ALTER TABLE participant_details ADD COLUMN IF NOT EXISTS agree_logistics_change TEXT;
+
+CREATE TABLE IF NOT EXISTS municipal_applications (
+    id               BIGSERIAL PRIMARY KEY,
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at       TIMESTAMPTZ,
+    fio              TEXT NOT NULL,
+    federal_district TEXT,
+    region           TEXT,
+    city             TEXT,
+    workplace        TEXT,
+    position         TEXT,
+    birth_date       TEXT,
+    snils            TEXT,
+    inn              TEXT,
+    phone            TEXT,
+    email            TEXT,
+    stream           TEXT,
+    address          TEXT,
+    passport_series  TEXT,
+    passport_number  TEXT,
+    passport_issued  TEXT,
+    consent_path     TEXT,
+    payload_raw      JSONB
+);
+
+CREATE INDEX IF NOT EXISTS municipal_applications_created_idx
+    ON municipal_applications (created_at DESC);
+CREATE INDEX IF NOT EXISTS municipal_applications_email_idx
+    ON municipal_applications (email);
+CREATE INDEX IF NOT EXISTS municipal_applications_deleted_idx
+    ON municipal_applications (deleted_at);

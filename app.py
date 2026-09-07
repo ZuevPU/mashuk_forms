@@ -4,7 +4,7 @@ import os
 import re
 import uuid
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 
 import psycopg
 from psycopg.types.json import Json
@@ -14,7 +14,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from admin_api import primary_upload_dir, router as admin_router
+from admin_api import (
+    ensure_soft_delete_columns,
+    primary_upload_dir,
+    router as admin_router,
+)
 
 load_dotenv()
 
@@ -135,6 +139,10 @@ def on_startup():
         ensure_info_columns()
     except Exception:
         log.exception("info columns check failed")
+    try:
+        ensure_soft_delete_columns()
+    except Exception:
+        log.exception("soft delete columns check failed")
     log.info("uploads dir %s exists=%s", UPLOAD_DIR, UPLOAD_DIR.is_dir())
 
 
@@ -471,10 +479,19 @@ async def info_submit(request: Request):
         "agree_logistics_fixed",
         "agree_logistics_change",
     }
+    unused = {
+        "id_doc_valid_from",
+        "entry_doc_valid_from",
+        "transit_visa",
+        "agree_tickets",
+    }
     values = []
     for col in INFO_COLS:
         if col == "payload_raw":
             values.append(Json(data))
+            continue
+        if col in unused:
+            values.append(None)
             continue
         val = data.get(col)
         if col in bool_cols:
@@ -500,6 +517,154 @@ async def info_submit(request: Request):
             conn.commit()
     except Exception:
         log.exception("info insert failed")
+        raise HTTPException(500, "database error")
+
+    return JSONResponse({"ok": True, "id": row[0] if row else None})
+
+
+MUNI_COLS = [
+    "fio",
+    "federal_district",
+    "region",
+    "city",
+    "workplace",
+    "position",
+    "birth_date",
+    "snils",
+    "inn",
+    "phone",
+    "email",
+    "stream",
+    "address",
+    "passport_series",
+    "passport_number",
+    "passport_issued",
+    "consent_path",
+    "payload_raw",
+]
+
+
+@app.get("/muni")
+@app.get("/muni/")
+def muni_page():
+    path = ROOT / "static" / "muni.html"
+    if not path.exists():
+        raise HTTPException(404, "municipal form is missing")
+    return FileResponse(path, media_type="text/html; charset=utf-8")
+
+
+@app.get("/muni/consent.pdf")
+def muni_consent_blank():
+    from municipal_consent import blank_pdf_bytes
+
+    try:
+        body = blank_pdf_bytes()
+    except FileNotFoundError:
+        raise HTTPException(404, "consent template is missing")
+    return Response(
+        content=body,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": 'attachment; filename="Soglasie_uchastnika.pdf"',
+            "Cache-Control": "no-store",
+        },
+    )
+
+
+@app.post("/muni/consent.pdf")
+async def muni_consent_filled(request: Request):
+    from municipal_consent import filled_pdf_bytes
+
+    try:
+        data = await request.json()
+    except Exception:
+        data = {}
+    if not isinstance(data, dict):
+        data = {}
+    try:
+        body = filled_pdf_bytes(data)
+    except FileNotFoundError:
+        raise HTTPException(404, "consent template is missing")
+    name = "Soglasie_uchastnika.pdf"
+    fio = " ".join(str(data.get("fio") or "").split())
+    if fio:
+        name = "Soglasie_" + "".join(ch if ch.isalnum() else "_" for ch in fio)[:40] + ".pdf"
+    return Response(
+        content=body,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": (
+                'attachment; filename="Soglasie_uchastnika.pdf"; filename*=UTF-8\'\''
+                + quote(name)
+            ),
+            "Cache-Control": "no-store",
+        },
+    )
+
+
+@app.post("/muni")
+def muni_apply(
+    payload: str = Form(...),
+    consent: UploadFile = File(...),
+):
+    if not DATABASE_URL:
+        raise HTTPException(500, "DATABASE_URL is not set")
+    try:
+        data = json.loads(payload)
+    except json.JSONDecodeError:
+        raise HTTPException(400, "payload must be JSON")
+    if not isinstance(data, dict):
+        raise HTTPException(400, "payload must be an object")
+    required = (
+        "fio",
+        "federal_district",
+        "region",
+        "city",
+        "workplace",
+        "position",
+        "birth_date",
+        "snils",
+        "inn",
+        "phone",
+        "email",
+        "stream",
+    )
+    for key in required:
+        if not str(data.get(key) or "").strip():
+            raise HTTPException(400, key + " required")
+
+    consent_path = save_upload(
+        "consent",
+        consent,
+        {".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx"},
+    )
+
+    values = []
+    for col in MUNI_COLS:
+        if col == "consent_path":
+            values.append(consent_path)
+        elif col == "payload_raw":
+            values.append(Json(data))
+        else:
+            val = data.get(col)
+            values.append(None if val is None else str(val).strip())
+
+    placeholders = ", ".join(["%s"] * len(MUNI_COLS))
+    sql = (
+        "INSERT INTO municipal_applications ("
+        + ", ".join(MUNI_COLS)
+        + ") VALUES ("
+        + placeholders
+        + ") RETURNING id"
+    )
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, values)
+                row = cur.fetchone()
+            conn.commit()
+    except Exception:
+        log.exception("muni insert failed")
         raise HTTPException(500, "database error")
 
     return JSONResponse({"ok": True, "id": row[0] if row else None})
