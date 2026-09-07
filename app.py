@@ -19,6 +19,14 @@ from admin_api import (
     primary_upload_dir,
     router as admin_router,
 )
+from muni_data import (
+    DISTRICTS,
+    REGIONS_SET,
+    normalize_district,
+    valid_email,
+    valid_inn,
+    valid_snils,
+)
 
 load_dotenv()
 
@@ -632,6 +640,20 @@ def muni_apply(
     for key in required:
         if not str(data.get(key) or "").strip():
             raise HTTPException(400, key + " required")
+
+    data["federal_district"] = normalize_district(str(data.get("federal_district") or ""))
+    if data["federal_district"] not in DISTRICTS:
+        raise HTTPException(400, "federal_district invalid")
+    region = str(data.get("region") or "").strip()
+    if region not in REGIONS_SET:
+        raise HTTPException(400, "region invalid")
+    data["region"] = region
+    if not valid_snils(str(data.get("snils") or "")):
+        raise HTTPException(400, "snils invalid")
+    if not valid_inn(str(data.get("inn") or "")):
+        raise HTTPException(400, "inn invalid")
+    if not valid_email(str(data.get("email") or "")):
+        raise HTTPException(400, "email invalid")
 
     consent_path = save_upload(
         "consent",
