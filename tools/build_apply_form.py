@@ -810,6 +810,7 @@ html.append(
         "stream",
         S["stream"],
         [
+            (S["s1opt"], S["s1opt"]),
             (S["s2opt"], S["s2opt"]),
             (S["s3opt"], S["s3opt"]),
             (S["s4opt"], S["s4opt"]),
