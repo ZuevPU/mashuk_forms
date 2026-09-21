@@ -635,9 +635,9 @@ def main():
     html.append("</div>")
     html.append('<p class="mshk-apply__step-label">' + h("dates_title") + "</p>")
     html.append('<div class="mshk-apply__waves mshk-apply__waves--2">')
-    for n, d in (("s1", "s1d"), ("s2", "s2d")):
+    for d in ("s1d", "s2d"):
         html.append(
-            '<div class="mshk-apply__wave"><b>' + h(n) + "</b><span>" + h(d) + "</span></div>"
+            '<div class="mshk-apply__wave"><span>' + h(d) + "</span></div>"
         )
     html.append("</div>")
     html.append('<div class="mshk-apply__fin"><h3>' + h("finance_title") + "</h3>")
