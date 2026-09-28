@@ -248,7 +248,7 @@ JS = r"""
   function collectDraft(){
     var o = {step: step, values: {}, checks: {}};
     $$("input, textarea, select").forEach(function(el){
-      if (!el.name) return;
+      if (!el.name || el.type === "file") return;
       if (el.type === "checkbox") {
         if (!o.checks[el.name]) o.checks[el.name] = [];
         if (el.checked) o.checks[el.name].push(el.value);
@@ -287,7 +287,7 @@ JS = r"""
         return;
       }
       var el = root.querySelector('[name="'+name+'"]');
-      if (el && el.type !== "checkbox") el.value = v;
+      if (el && el.type !== "checkbox" && el.type !== "file") el.value = v;
     });
     Object.keys(o.checks || {}).forEach(function(name){
       var set = o.checks[name] || [];
@@ -334,6 +334,29 @@ JS = r"""
   var STEP4 = ["visa_needed","visa_current"];
   var STEP5 = ["allergies","health_conditions","meal_type"];
   var STEP6 = ["agree_participate","agree_notice","agree_truth","agree_extra_docs","agree_refusal","agree_logistics_city","agree_logistics_change","agree_logistics_fixed"];
+  function validatePassport(){
+    var input = $("#passport_scan");
+    var file = input.files[0];
+    var msg = !file ? "Прикрепите скан-копию паспорта." :
+      (!/\.(pdf|jpe?g|png)$/i.test(file.name) ? "Выберите файл PDF, JPG или PNG." :
+      (!file.size || file.size > 20*1024*1024 ? "Файл должен быть непустым и не больше 20 МБ." : ""));
+    showErr("passport_scan", msg);
+    return !msg;
+  }
+  $("#passport_scan").addEventListener("change", function(){
+    var file = this.files[0];
+    $("#passport_scan_name").textContent = file ? file.name + " (" + (file.size/1024/1024).toFixed(1) + " МБ)" : "Файл не выбран";
+    $("#passport_scan_remove").hidden = !file;
+    validatePassport();
+    notifyHeight();
+  });
+  $("#passport_scan_remove").addEventListener("click", function(){
+    $("#passport_scan").value = "";
+    $("#passport_scan_name").textContent = "Файл не выбран";
+    this.hidden = true;
+    showErr("passport_scan", "");
+    notifyHeight();
+  });
   function validStep(n){
     var ok = true;
     function req(name){ if (!need(name)) ok = false; }
@@ -342,6 +365,7 @@ JS = r"""
       if (val("other_citizenships")==="\u0414\u0430") req("other_citizenships_detail");
     }
     if (n===2) {
+      if (!validatePassport()) ok = false;
       STEP2.forEach(req);
       if (val("id_doc_type")==="\u0414\u0440\u0443\u0433\u043e\u0435") req("id_doc_type_other");
     }
@@ -405,6 +429,7 @@ JS = r"""
     };
   }
   function submit(){
+    if (!validatePassport()) { go(2); focusFirstError(); return; }
     if (!validStep(6)) return;
     var btn = root.querySelector("[data-send]");
     if (btn) btn.disabled = true;
@@ -416,17 +441,20 @@ JS = r"""
       scrollFormTop();
       setTimeout(notifyHeight, 50);
     }
+    var body = new FormData();
+    body.append("payload", JSON.stringify(payload()));
+    body.append("passport_scan", $("#passport_scan").files[0]);
     fetch(ENDPOINT, {
       method:"POST",
-      headers: {"Content-Type":"application/json","Accept":"application/json"},
-      body: JSON.stringify(payload())
+      headers: {"Accept":"application/json"},
+      body: body
     }).then(function(r){
-      if (!r.ok) throw new Error("bad");
+      if (!r.ok) return r.json().catch(function(){ return {}; }).then(function(err){ throw new Error(typeof err.detail === "string" ? err.detail : T.err_send); });
       clearDraft();
       done(T.ok_sent);
-    }).catch(function(){
+    }).catch(function(err){
       if (btn) btn.disabled = false;
-      alert(T.err_send);
+      alert(err.message || T.err_send);
     });
   }
   function focusFirstError(){
@@ -554,6 +582,14 @@ form.append(field("id_doc_number", S["number"]))
 form.append(field("id_doc_issued", S["issued"], "", "date"))
 form.append(field("id_doc_valid_to", S["valid"], S["valid_h"]))
 form.append(field("id_doc_issuer", S["issuer"], "", "text", True, True))
+form.append('''<div class="mshk-apply__field" data-field="passport_scan">
+<label class="mshk-apply__label" for="passport_scan">Прикрепите скан-копию паспорта *</label>
+<p class="mshk-apply__hint" id="passport_scan_hint">Для приобретения билетов к месту проведения мероприятия и обратно просим прикрепить скан-копию паспорта (страница с фотографией и данными). Подготовьте один файл в форматах PDF, JPG или PNG. Убедитесь, что все данные читаемы и не обрезаны. Максимальный размер — 20 МБ.</p>
+<input class="mshk-apply__input" id="passport_scan" name="passport_scan" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required aria-describedby="passport_scan_hint passport_scan_name">
+<p class="mshk-apply__hint" id="passport_scan_name" aria-live="polite">Файл не выбран</p>
+<button type="button" class="mshk-apply__btn" id="passport_scan_remove" hidden>Убрать файл</button>
+<p class="mshk-apply__hint">После перезагрузки страницы файл необходимо выбрать заново.</p>
+<p class="mshk-apply__err" hidden></p></div>''')
 form.append(field("entry_doc_name", S["entry"]))
 form.append(field("entry_doc_series", S["series"], S["series_h"]))
 form.append(field("entry_doc_number", S["number"]))

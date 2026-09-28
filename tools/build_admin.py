@@ -545,7 +545,7 @@ html = f"""<!DOCTYPE html>
           tr.innerHTML =
             "<td>" + it.id + "</td>" +
             "<td>" + fmtDate(it.created_at) + "</td>" +
-            "<td><b>" + esc(it.fio_latin||"") + "</b></td>" +
+            "<td><b>" + esc(it.fio_latin||"") + "</b><br><span>" + (it.has_passport ? "Скан паспорта прикреплён" : "Нет скана паспорта") + "</span></td>" +
             "<td>" + esc(it.meal_type||"") + "</td>" +
             "<td>" + esc(it.depart_country||"") + "</td>" +
             "<td>" + esc(it.depart_city||"") + "</td>" +
@@ -632,6 +632,12 @@ html = f"""<!DOCTYPE html>
         if (skip[k]) return;
         html += '<div class="kv"><b>' + esc(labels[k]) + "</b><span>" + esc(fmtVal(k === "deleted_at" ? fmtDate(it[k]) : it[k])) + "</span></div>";
       }});
+      if (form === "info") {{
+        html += '<div class="kv"><b>Скан паспорта</b><span>';
+        if (it.has_passport) html += '<button class="btn btn-navy" type="button" data-dl="/admin/api/participants/' + id + '/file/passport" data-name="passport">Скачать скан паспорта</button>';
+        else html += 'Не прикреплён';
+        html += '</span></div>';
+      }}
       if (form !== "info") {{
         html += '<div class="kv"><b>' + T.files + "</b><span>";
         if (form === "apply") {{

@@ -105,6 +105,8 @@ CREATE TABLE IF NOT EXISTS participant_details (
 
 CREATE INDEX IF NOT EXISTS participant_details_created_idx
     ON participant_details (created_at DESC);
+
+ALTER TABLE participant_details ADD COLUMN IF NOT EXISTS passport_scan_path TEXT;
 CREATE INDEX IF NOT EXISTS participant_details_stream_idx
     ON participant_details (stream);
 

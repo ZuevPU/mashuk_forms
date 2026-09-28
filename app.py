@@ -186,6 +186,7 @@ def health():
 
 
 INFO_COLS = [
+    "passport_scan_path",
     "fio_latin",
     "gender",
     "citizenship",
@@ -447,8 +448,37 @@ def apply(
     return JSONResponse({"ok": True, "id": row[0] if row else None})
 
 
+def save_passport_scan(upload) -> str:
+    if not upload or not getattr(upload, "filename", None) or not hasattr(upload, "file"):
+        raise HTTPException(400, "Прикрепите скан-копию паспорта.")
+    suffix = Path(upload.filename).suffix.lower()
+    if suffix not in {".pdf", ".jpg", ".jpeg", ".png"}:
+        raise HTTPException(400, "Допустимы только PDF, JPG и PNG.")
+    limit = min(MAX_BYTES, 20 * 1024 * 1024)
+    data = upload.file.read(limit + 1)
+    if not data or len(data) > limit:
+        raise HTTPException(400, "Файл пуст или превышает допустимый размер (до 20 МБ).")
+    valid = (
+        (suffix == ".pdf" and data.startswith(b"%PDF-"))
+        or (suffix in {".jpg", ".jpeg"} and data.startswith(b"\xff\xd8\xff"))
+        or (suffix == ".png" and data.startswith(b"\x89PNG\r\n\x1a\n"))
+    )
+    if not valid:
+        raise HTTPException(400, "Содержимое файла не соответствует формату PDF, JPG или PNG.")
+    name = f"{uuid.uuid4().hex}_passport{suffix}"
+    (UPLOAD_DIR / name).write_bytes(data)
+    return name
+
+
 @app.post("/info")
 async def info_submit(request: Request):
+    if "application/json" in (request.headers.get("content-type") or "").lower():
+        return await _info_submit(request)
+    async with request.form(max_files=1) as form:
+        return await _info_submit(request, form)
+
+
+async def _info_submit(request: Request, form=None):
     if not DATABASE_URL:
         raise HTTPException(500, "DATABASE_URL is not set")
     ctype = (request.headers.get("content-type") or "").lower()
@@ -456,7 +486,6 @@ async def info_submit(request: Request):
         if "application/json" in ctype:
             data = await request.json()
         else:
-            form = await request.form()
             data = json.loads(str(form.get("payload") or "{}"))
     except Exception:
         raise HTTPException(400, "payload must be JSON")
@@ -475,6 +504,11 @@ async def info_submit(request: Request):
             raise HTTPException(400, "other_citizenships_detail required")
     if not str(data.get("stream") or "").strip():
         raise HTTPException(400, "stream required")
+
+    upload = form.get("passport_scan") if form is not None else None
+    scan_path = save_passport_scan(upload)
+    # Never accept a storage path supplied by a client.
+    data["passport_scan_path"] = scan_path
 
     bool_cols = {
         "agree_tickets",
@@ -525,6 +559,7 @@ async def info_submit(request: Request):
             conn.commit()
     except Exception:
         log.exception("info insert failed")
+        (UPLOAD_DIR / scan_path).unlink(missing_ok=True)
         raise HTTPException(500, "database error")
 
     return JSONResponse({"ok": True, "id": row[0] if row else None})

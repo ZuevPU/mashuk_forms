@@ -944,7 +944,7 @@ def list_participants(request: Request, mashuk_admin: Optional[str] = Cookie(def
     sql_count = f"SELECT COUNT(*) FROM participant_details WHERE {where}"
     sql = (
         "SELECT id, created_at, deleted_at, fio_latin, meal_type, stream, depart_country, "
-        "depart_city, visa_needed, return_ticket, baggage "
+        "depart_city, visa_needed, return_ticket, baggage, (passport_scan_path IS NOT NULL) AS has_passport "
         f"FROM participant_details WHERE {where} "
         f"ORDER BY {f['sort']} {f['order']} NULLS LAST "
         "LIMIT %s OFFSET %s"
@@ -979,7 +979,9 @@ def export_participants_xlsx(request: Request, mashuk_admin: Optional[str] = Coo
         with conn.cursor() as cur:
             cur.execute(sql, args)
             rows = as_dicts(cur)
-    return _xlsx(rows, INFO_EXCEL_COLUMNS, "Uchastniki", "mashuk_uchastniki.xlsx")
+    for row in rows:
+        row["has_passport"] = "Да" if row.get("passport_scan_path") else "Нет"
+    return _xlsx(rows, INFO_EXCEL_COLUMNS + [("has_passport", "Скан паспорта")], "Uchastniki", "mashuk_uchastniki.xlsx")
 
 
 @router.get("/api/participants/{item_id}")
@@ -995,7 +997,22 @@ def get_participant(item_id: int, mashuk_admin: Optional[str] = Cookie(default=N
         raise HTTPException(404, "not found")
     item = items[0]
     item.pop("payload_raw", None)
+    item["has_passport"] = bool(item.pop("passport_scan_path", None))
     return item
+
+
+@router.get("/api/participants/{item_id}/file/passport")
+def get_participant_passport(item_id: int, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    with db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT passport_scan_path, fio_latin FROM participant_details WHERE id = %s", (item_id,))
+            row = cur.fetchone()
+    if not row or not row[0]:
+        raise HTTPException(404, "Скан паспорта не прикреплён")
+    path = find_upload(row[0])
+    name = "passport_" + safe_fio_name({"id": item_id, "fio_latin": row[1]}) + path.suffix.lower()
+    return send_download(path, name)
 
 
 @router.post("/api/participants/{item_id}/trash")
