@@ -147,6 +147,7 @@ CREATE TABLE IF NOT EXISTS municipal_applications (
     phone            TEXT,
     email            TEXT,
     stream           TEXT,
+    colleagues       TEXT,
     address          TEXT,
     passport_series  TEXT,
     passport_number  TEXT,
@@ -154,6 +155,8 @@ CREATE TABLE IF NOT EXISTS municipal_applications (
     consent_path     TEXT,
     payload_raw      JSONB
 );
+
+ALTER TABLE municipal_applications ADD COLUMN IF NOT EXISTS colleagues TEXT;
 
 CREATE INDEX IF NOT EXISTS municipal_applications_created_idx
     ON municipal_applications (created_at DESC);

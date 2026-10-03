@@ -578,6 +578,7 @@ MUNI_COLS = [
     "phone",
     "email",
     "stream",
+    "colleagues",
     "address",
     "passport_series",
     "passport_number",

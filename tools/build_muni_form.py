@@ -162,6 +162,24 @@ def file_box(name, label, hint, accept, note_id):
     )
 
 
+def colleagues_field():
+    label = (
+        eh(S["colleagues_before"])
+        + "<strong>"
+        + eh(S["colleagues_bold"])
+        + "</strong>"
+        + eh(S["colleagues_after"])
+    )
+    return (
+        '<div class="mshk-apply__field" data-field="colleagues">'
+        '<label class="mshk-apply__label" for="colleagues">'
+        + label
+        + '</label><textarea class="mshk-apply__input mshk-apply__area" '
+        'id="colleagues" name="colleagues" rows="4"></textarea>'
+        '<p class="mshk-apply__err" hidden></p></div>'
+    )
+
+
 js_i18n = json.dumps(
     {
         "req": S["req"],
@@ -517,6 +535,7 @@ JS = r"""
       phone: val("phone"),
       email: val("email"),
       stream: val("stream"),
+      colleagues: val("colleagues"),
       address: val("address"),
       passport_series: val("passport_series"),
       passport_number: val("passport_number"),
@@ -675,6 +694,7 @@ def main():
             [(S["s1opt"], S["s1opt"]), (S["s2opt"], S["s2opt"])],
         )
     )
+    html.append(colleagues_field())
     html.append("</div>")
 
     html.append('<div class="mshk-apply__section">')
