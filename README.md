@@ -11,6 +11,9 @@
 АПИ заявок: `POST /apply`, `POST /info`, `POST /muni`
 Проверка: `GET /health`
 
+Регистрация на семинар муниципалитетов открыта. В форме один вариант дат:
+13–16 ноября 2026 года (`tools/muni_strings.py`, ключ `s1d`).
+
 Репозиторий: https://github.com/ZuevPU/mashuk_forms
 
 ## Структура

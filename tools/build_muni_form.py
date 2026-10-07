@@ -92,15 +92,18 @@ def field(name, label, hint="", typ="text", required=True, area=False, extra="")
     )
 
 
-def radios(name, label, options):
+def radios(name, label, options, required=True):
     items = []
+    req = " required" if required else ""
     for val, txt in options:
         items.append(
             '<label class="mshk-apply__choice"><input type="radio" name="'
             + name
             + '" value="'
             + eh(val)
-            + '" required><span>'
+            + '"'
+            + req
+            + "><span>"
             + eh(txt)
             + "</span></label>"
         )
@@ -654,7 +657,7 @@ def main():
     html.append("</div>")
     html.append('<p class="mshk-apply__step-label">' + h("dates_title") + "</p>")
     html.append('<div class="mshk-apply__waves mshk-apply__waves--2">')
-    for d in ("s1d", "s2d"):
+    for d in ("s1d",):
         html.append(
             '<div class="mshk-apply__wave"><span>' + h(d) + "</span></div>"
         )
@@ -691,7 +694,8 @@ def main():
         radios(
             "stream",
             S["stream"],
-            [(S["s1opt"], S["s1opt"]), (S["s2opt"], S["s2opt"])],
+            [(S["s1opt"], S["s1opt"])],
+            required=False,
         )
     )
     html.append(colleagues_field())
