@@ -4,6 +4,7 @@ import os
 import re
 import uuid
 from pathlib import Path
+from typing import Optional
 from urllib.parse import quote, urlparse
 
 import psycopg
@@ -649,7 +650,7 @@ async def muni_consent_filled(request: Request):
 @app.post("/muni")
 def muni_apply(
     payload: str = Form(...),
-    consent: UploadFile = File(...),
+    consent: Optional[UploadFile] = File(default=None),
 ):
     if not DATABASE_URL:
         raise HTTPException(500, "DATABASE_URL is not set")
@@ -691,11 +692,15 @@ def muni_apply(
     if not valid_email(str(data.get("email") or "")):
         raise HTTPException(400, "email invalid")
 
-    consent_path = save_upload(
-        "consent",
-        consent,
-        {".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx"},
-    )
+    # The signed-consent upload was removed from the form, so the file is
+    # optional: applications submitted without it store an empty path.
+    consent_path = None
+    if consent is not None and getattr(consent, "filename", ""):
+        consent_path = save_upload(
+            "consent",
+            consent,
+            {".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx"},
+        )
 
     values = []
     for col in MUNI_COLS:

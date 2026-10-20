@@ -47,23 +47,19 @@ class MunicipalColleaguesTests(unittest.TestCase):
             "mashuk_admin", admin_api._sign(str(int(time.time()) + 60))
         )
 
-    def test_submission_persists_colleagues(self):
+    def test_submission_without_consent_file(self):
         with patch.object(app, "DATABASE_URL", "test-only"), \
              patch.object(app, "valid_snils", return_value=True), \
              patch.object(app, "valid_inn", return_value=True), \
-             patch.object(app, "save_upload", return_value="consent/test.pdf"), \
              patch.object(app.psycopg, "connect") as connect:
             cursor = connect.return_value.__enter__.return_value.cursor.return_value.__enter__.return_value
             cursor.fetchone.return_value = (42,)
             response = self.client.post(
-                "/muni",
-                data={"payload": json.dumps(self.payload)},
-                files={"consent": ("consent.pdf", b"%PDF-1.4\n%%EOF")},
+                "/muni", data={"payload": json.dumps(self.payload)}
             )
         self.assertEqual(response.status_code, 200, response.text)
-        sql, values = cursor.execute.call_args.args
-        self.assertIn("colleagues", sql)
-        self.assertEqual(values[app.MUNI_COLS.index("colleagues")], self.colleagues)
+        _, values = cursor.execute.call_args.args
+        self.assertIsNone(values[app.MUNI_COLS.index("consent_path")])
 
     def test_admin_card_and_excel_include_colleagues(self):
         self.login()

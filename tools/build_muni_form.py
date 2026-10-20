@@ -262,30 +262,6 @@ JS = r"""
     if (!val(name)) { showErr(name, T.req); return false; }
     showErr(name, ""); return true;
   }
-  var picked = {};
-  function getFile(id){
-    var input = $("#"+id);
-    if (input && input.files && input.files[0]) {
-      picked[id] = input.files[0];
-      return input.files[0];
-    }
-    return picked[id] || null;
-  }
-  function markFile(id, f){
-    var nameEl = $("#"+id+"-name");
-    if (!nameEl) return;
-    nameEl.textContent = f ? (f.name + " | " + T.file_ok) : "PDF / JPG / PNG";
-  }
-  var input = $("#consent_file");
-  if (input) input.addEventListener("change", function(){
-    var f = input.files && input.files[0];
-    if (!f){ if (picked.consent_file) markFile("consent_file", picked.consent_file); return; }
-    if (f.size > 20*1024*1024){ alert(T.err_file); input.value=""; picked.consent_file=null; markFile("consent_file", null); return; }
-    picked.consent_file = f;
-    markFile("consent_file", f);
-    showErr("consent_file", "");
-    saveDraft();
-  });
   var DRAFT_KEY = "mshk-muni-draft-v1";
   var saveTimer = null;
   function collectDraft(){
@@ -476,54 +452,6 @@ JS = r"""
     if (hidden.value && isKnownRegion(hidden.value)) search.value = hidden.value;
     else if (search.value && isKnownRegion(search.value)) hidden.value = search.value;
   }
-  function consentPayload(){
-    return {
-      fio: val("fio"),
-      address: val("address"),
-      phone: val("phone"),
-      email: val("email"),
-      passport_series: val("passport_series"),
-      passport_number: val("passport_number"),
-      passport_issued: val("passport_issued"),
-      snils: val("snils"),
-      inn: val("inn"),
-      region: val("region"),
-      workplace: val("workplace")
-    };
-  }
-  function saveBlob(blob, name){
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = name;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1500);
-  }
-  var blankBtn = $("[data-blank]");
-  if (blankBtn) blankBtn.addEventListener("click", function(){
-    fetch("/muni/consent.pdf").then(function(r){
-      if (!r.ok) throw new Error("bad");
-      return r.blob();
-    }).then(function(b){ saveBlob(b, "Soglasie_uchastnika.pdf"); }).catch(function(){
-      alert(T.err_send);
-    });
-  });
-  var fillBtn = $("[data-filled]");
-  if (fillBtn) fillBtn.addEventListener("click", function(){
-    if (!val("fio")) { showErr("fio", T.err_fio_dl); alert(T.err_fio_dl); return; }
-    showErr("fio", "");
-    fetch("/muni/consent.pdf", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(consentPayload())
-    }).then(function(r){
-      if (!r.ok) throw new Error("bad");
-      return r.blob();
-    }).then(function(b){
-      var name = "Soglasie_" + val("fio").replace(/\s+/g, "_").slice(0,40) + ".pdf";
-      saveBlob(b, name);
-    }).catch(function(){ alert(T.err_send); });
-  });
   function collect(){
     return {
       fio: val("fio"),
@@ -538,11 +466,7 @@ JS = r"""
       phone: val("phone"),
       email: val("email"),
       stream: val("stream"),
-      colleagues: val("colleagues"),
-      address: val("address"),
-      passport_series: val("passport_series"),
-      passport_number: val("passport_number"),
-      passport_issued: val("passport_issued")
+      colleagues: val("colleagues")
     };
   }
   function validate(){
@@ -554,9 +478,6 @@ JS = r"""
     if (val("snils") && !validSnils(val("snils"))) { showErr("snils", T.err_snils); ok = false; }
     if (val("inn") && !validInn(val("inn"))) { showErr("inn", T.err_inn); ok = false; }
     if (val("email") && !validEmail(val("email"))) { showErr("email", T.err_email); ok = false; }
-    if (!getFile("consent_file")) { showErr("consent_file", T.err_sign); ok = false; }
-    if (!$("#consent_confirm") || !$("#consent_confirm").checked) { showErr("consent_confirm", T.err_confirm); ok = false; }
-    else showErr("consent_confirm", "");
     return ok;
   }
   var sendBtn = $("[data-send]");
@@ -569,7 +490,6 @@ JS = r"""
     sendBtn.disabled = true;
     var fd = new FormData();
     fd.append("payload", JSON.stringify(collect()));
-    fd.append("consent", getFile("consent_file"));
     fetch(ENDPOINT, { method:"POST", body: fd }).then(function(r){
       if (!r.ok) throw new Error("bad");
       return r.json();
@@ -701,46 +621,6 @@ def main():
     html.append(colleagues_field())
     html.append("</div>")
 
-    html.append('<div class="mshk-apply__section">')
-    html.append('<div class="mshk-apply__consent">')
-    html.append('<p class="mshk-apply__kicker">' + h("consent_kicker") + "</p>")
-    html.append('<p class="mshk-apply__p" style="font-weight:500">' + h("consent_title") + "</p>")
-    html.append('<p class="mshk-apply__p">' + h("consent_intro") + "</p>")
-    html.append("</div>")
-    html.append('<p class="mshk-apply__hint" style="margin-bottom:14px">' + h("pass_opt") + "</p>")
-    html.append(field("address", S["addr"], S["addr_h"], "text", False, True))
-    html.append('<div class="mshk-apply__row">')
-    html.append(field("passport_series", S["pass_ser"], "", "text", False))
-    html.append(field("passport_number", S["pass_num"], "", "text", False))
-    html.append("</div>")
-    html.append(field("passport_issued", S["pass_by"], "", "text", False))
-    html.append('<div class="mshk-apply__dl">')
-    html.append(
-        '<button class="mshk-apply__btn mshk-apply__btn--ghost" type="button" data-blank>'
-        + h("dl_blank")
-        + "</button>"
-    )
-    html.append(
-        '<button class="mshk-apply__btn mshk-apply__btn--gold" type="button" data-filled>'
-        + h("dl_filled")
-        + "</button>"
-    )
-    html.append("</div>")
-    html.append(
-        file_box(
-            "consent_file",
-            S["signed"],
-            S["signed_h"],
-            "application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png,.doc,.docx",
-            "consent_file-name",
-        )
-    )
-    html.append(
-        '<fieldset class="mshk-apply__field" data-field="consent_confirm"><label class="mshk-apply__choice"><input type="checkbox" id="consent_confirm" name="consent_confirm" required><span>'
-        + h("confirm")
-        + '</span></label><p class="mshk-apply__err" hidden></p></fieldset>'
-    )
-    html.append("</div>")
     html.append(
         '<div class="mshk-apply__nav"><span></span><button class="mshk-apply__btn mshk-apply__btn--navy" type="button" data-send>'
         + h("send")
