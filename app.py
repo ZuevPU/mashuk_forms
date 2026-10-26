@@ -811,7 +811,7 @@ CULTISTUD_REQUIRED = (
 def cultistud_form_page(request: Request):
     form = ROOT / "static" / "cultistudform.html"
     gate = ROOT / "static" / "cultistudgate.html"
-    if not cultistud_allowed(request):
+    if not cultistud_allowed(request, request.query_params.get("t", "")):
         if not gate.exists():
             raise HTTPException(404, "password screen is missing")
         return FileResponse(

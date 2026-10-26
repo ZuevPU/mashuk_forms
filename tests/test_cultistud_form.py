@@ -71,6 +71,18 @@ class CultistudFormTests(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertIn('data-field="fio"', r.text)
 
+    def test_token_alone_opens_the_form_without_cookies(self):
+        # Inside the Tilda iframe third-party cookies may be blocked, so the
+        # token from the URL must be enough on its own.
+        import html as H
+
+        token = self.token()
+        self.client.cookies.clear()
+        r = self.client.get("/cultistudform", params={"t": token})
+        self.assertEqual(r.status_code, 200)
+        self.assertIn('data-field="fio"', r.text)
+        self.assertNotIn("Доступ по паролю", H.unescape(r.text))
+
     def test_broken_and_expired_tokens_are_rejected(self):
         import html as H
 
