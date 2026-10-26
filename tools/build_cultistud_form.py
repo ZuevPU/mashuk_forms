@@ -405,6 +405,9 @@ JS = r"""
     sendBtn.disabled = true;
     var fd = new FormData();
     fd.append("payload", JSON.stringify(collect()));
+    var access = "";
+    try { access = new URLSearchParams(window.location.search).get("t") || ""; } catch (e) {}
+    if (access) fd.append("t", access);
     fetch(ENDPOINT, { method:"POST", body: fd }).then(function(r){
       if (!r.ok) throw new Error("bad");
       return r.json();

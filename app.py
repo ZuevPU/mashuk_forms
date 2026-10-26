@@ -1,7 +1,10 @@
+import hashlib
+import hmac
 import json
 import logging
 import os
 import re
+import time
 import uuid
 from pathlib import Path
 from typing import Optional
@@ -752,6 +755,42 @@ CULTISTUD_COLS = [
 # The seminar runs once, so the stream is fixed instead of being asked.
 CULTISTUD_STREAM = "\u0035 \u2014 8 \u043d\u043e\u044f\u0431\u0440\u044f 2026"
 
+# The registration page is protected by a password. The token in the URL keeps
+# access working inside the Tilda iframe, where third-party cookies may be
+# blocked; the cookie covers direct visits to the form.
+CULTISTUD_PASSWORD = os.environ.get("CULTISTUD_PASSWORD", "2610").strip() or "2610"
+CULTISTUD_COOKIE = "mshk_cultistud"
+CULTISTUD_TOKEN_TTL = 7 * 24 * 60 * 60
+
+
+def _cultistud_secret() -> bytes:
+    return (os.environ.get("ADMIN_SECRET", "").strip() or "cultistud").encode("utf-8")
+
+
+def _cultistud_sign(exp: str) -> str:
+    return hmac.new(
+        _cultistud_secret(), ("cultistud:" + exp).encode("utf-8"), hashlib.sha256
+    ).hexdigest()[:32]
+
+
+def cultistud_token_ok(token: str) -> bool:
+    if not token or "." not in token:
+        return False
+    exp_raw, sig = token.split(".", 1)
+    try:
+        exp = int(exp_raw)
+    except ValueError:
+        return False
+    if exp < int(time.time()):
+        return False
+    return hmac.compare_digest(sig, _cultistud_sign(exp_raw))
+
+
+def cultistud_allowed(request: Request, token: str = "") -> bool:
+    if token and cultistud_token_ok(token):
+        return True
+    return cultistud_token_ok(request.cookies.get(CULTISTUD_COOKIE, ""))
+
 CULTISTUD_REQUIRED = (
     "fio",
     "federal_district",
@@ -769,15 +808,52 @@ CULTISTUD_REQUIRED = (
 
 @app.get("/cultistudform")
 @app.get("/cultistudform/")
-def cultistud_form_page():
-    path = ROOT / "static" / "cultistudform.html"
-    if not path.exists():
+def cultistud_form_page(request: Request):
+    form = ROOT / "static" / "cultistudform.html"
+    gate = ROOT / "static" / "cultistudgate.html"
+    if not cultistud_allowed(request):
+        if not gate.exists():
+            raise HTTPException(404, "password screen is missing")
+        return FileResponse(
+            gate,
+            media_type="text/html; charset=utf-8",
+            headers={"Cache-Control": "no-store"},
+        )
+    if not form.exists():
         raise HTTPException(404, "university form is missing")
-    return FileResponse(path, media_type="text/html; charset=utf-8")
+    return FileResponse(
+        form,
+        media_type="text/html; charset=utf-8",
+        headers={"Cache-Control": "no-store"},
+    )
+
+
+@app.post("/cultistudform/unlock")
+def cultistud_unlock(request: Request, password: str = Form("")):
+    if not hmac.compare_digest(password.strip(), CULTISTUD_PASSWORD):
+        raise HTTPException(401, "wrong password")
+    exp = str(int(time.time()) + CULTISTUD_TOKEN_TTL)
+    token = exp + "." + _cultistud_sign(exp)
+    response = JSONResponse({"ok": True, "token": token})
+    response.set_cookie(
+        CULTISTUD_COOKIE,
+        token,
+        max_age=CULTISTUD_TOKEN_TTL,
+        httponly=True,
+        samesite="lax",
+        secure=request.url.scheme == "https",
+    )
+    return response
 
 
 @app.post("/cultistudform")
-def cultistud_apply(payload: str = Form(...)):
+def cultistud_apply(
+    request: Request,
+    payload: str = Form(...),
+    t: str = Form(default=""),
+):
+    if not cultistud_allowed(request, t):
+        raise HTTPException(403, "password required")
     if not DATABASE_URL:
         raise HTTPException(500, "DATABASE_URL is not set")
     try:
