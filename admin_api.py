@@ -515,10 +515,10 @@ def where_sql(f):
         clauses.append("gender = %s")
         args.append(f["gender"])
     if f["date_from"]:
-        clauses.append("created_at::date >= %s")
+        clauses.append("created_at >= %s::date")
         args.append(f["date_from"])
     if f["date_to"]:
-        clauses.append("created_at::date <= %s")
+        clauses.append("created_at < (%s::date + 1)")
         args.append(f["date_to"])
     return " AND ".join(clauses), args
 
@@ -559,10 +559,10 @@ def where_info_sql(f):
         clauses.append("depart_country ILIKE %s")
         args.append("%" + f["country"] + "%")
     if f["date_from"]:
-        clauses.append("created_at::date >= %s")
+        clauses.append("created_at >= %s::date")
         args.append(f["date_from"])
     if f["date_to"]:
-        clauses.append("created_at::date <= %s")
+        clauses.append("created_at < (%s::date + 1)")
         args.append(f["date_to"])
     return " AND ".join(clauses), args
 
@@ -603,10 +603,10 @@ def where_muni_sql(f):
         clauses.append("region ILIKE %s")
         args.append("%" + f["country"] + "%")
     if f["date_from"]:
-        clauses.append("created_at::date >= %s")
+        clauses.append("created_at >= %s::date")
         args.append(f["date_from"])
     if f["date_to"]:
-        clauses.append("created_at::date <= %s")
+        clauses.append("created_at < (%s::date + 1)")
         args.append(f["date_to"])
     return " AND ".join(clauses), args
 

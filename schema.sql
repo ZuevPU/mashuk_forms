@@ -192,3 +192,32 @@ CREATE INDEX IF NOT EXISTS cultistud_applications_email_idx
     ON cultistud_applications (email);
 CREATE INDEX IF NOT EXISTS cultistud_applications_deleted_idx
     ON cultistud_applications (deleted_at);
+
+-- Indexes tuned for the admin panel: the list is always filtered by the soft
+-- delete flag and sorted, so partial indexes keep the hot path small. The
+-- stream column is filtered by equality in every form except participant data.
+CREATE INDEX IF NOT EXISTS seminar_applications_live_created_idx
+    ON seminar_applications (created_at DESC) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS seminar_applications_trash_deleted_idx
+    ON seminar_applications (deleted_at DESC) WHERE deleted_at IS NOT NULL;
+CREATE INDEX IF NOT EXISTS seminar_applications_stream_idx
+    ON seminar_applications (stream);
+
+CREATE INDEX IF NOT EXISTS participant_details_live_created_idx
+    ON participant_details (created_at DESC) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS participant_details_trash_deleted_idx
+    ON participant_details (deleted_at DESC) WHERE deleted_at IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS municipal_applications_live_created_idx
+    ON municipal_applications (created_at DESC) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS municipal_applications_trash_deleted_idx
+    ON municipal_applications (deleted_at DESC) WHERE deleted_at IS NOT NULL;
+CREATE INDEX IF NOT EXISTS municipal_applications_stream_idx
+    ON municipal_applications (stream);
+
+CREATE INDEX IF NOT EXISTS cultistud_applications_live_created_idx
+    ON cultistud_applications (created_at DESC) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS cultistud_applications_trash_deleted_idx
+    ON cultistud_applications (deleted_at DESC) WHERE deleted_at IS NOT NULL;
+CREATE INDEX IF NOT EXISTS cultistud_applications_stream_idx
+    ON cultistud_applications (stream);
