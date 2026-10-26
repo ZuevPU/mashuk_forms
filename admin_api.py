@@ -184,6 +184,27 @@ MUNI_EXCEL_COLUMNS = [
 ]
 
 
+# University seminar (Cultistudform): no consent upload, fixed stream.
+CULTISTUD_EXCEL_COLUMNS = [
+    ("id", "ID"),
+    ("created_at", "\u0414\u0430\u0442\u0430 \u043f\u043e\u0434\u0430\u0447\u0438"),
+    ("fio", "\u0424\u0418\u041e"),
+    ("federal_district", "\u0424\u0435\u0434\u0435\u0440\u0430\u043b\u044c\u043d\u044b\u0439 \u043e\u043a\u0440\u0443\u0433"),
+    ("region", "\u0420\u0435\u0433\u0438\u043e\u043d"),
+    ("city", "\u0413\u043e\u0440\u043e\u0434"),
+    ("workplace", "\u0423\u0447\u0435\u0431\u043d\u043e\u0435 \u0437\u0430\u0432\u0435\u0434\u0435\u043d\u0438\u0435 / \u043c\u0435\u0441\u0442\u043e \u0440\u0430\u0431\u043e\u0442\u044b"),
+    ("position", "\u0414\u043e\u043b\u0436\u043d\u043e\u0441\u0442\u044c / \u043a\u0443\u0440\u0441 \u0438 \u043d\u0430\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435"),
+    ("birth_date", "\u0414\u0430\u0442\u0430 \u0440\u043e\u0436\u0434\u0435\u043d\u0438\u044f"),
+    ("snils", "\u0421\u041d\u0418\u041b\u0421"),
+    ("inn", "\u0418\u041d\u041d"),
+    ("phone", "\u0422\u0435\u043b\u0435\u0444\u043e\u043d"),
+    ("email", "E-mail"),
+    ("stream", "\u041f\u043e\u0442\u043e\u043a"),
+]
+
+CULTISTUD_TABLE = "cultistud_applications"
+
+
 def _password() -> str:
     return os.environ.get("ADMIN_PASSWORD", "").strip()
 
@@ -410,7 +431,7 @@ def ensure_soft_delete_columns() -> None:
         return
     with psycopg.connect(url) as conn:
         with conn.cursor() as cur:
-            for table in ("seminar_applications", "participant_details", "municipal_applications"):
+            for table in ("seminar_applications", "participant_details", "municipal_applications", CULTISTUD_TABLE):
                 cur.execute(
                     f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ"
                 )
@@ -649,12 +670,13 @@ def meta(request: Request, mashuk_admin: Optional[str] = Cookie(default=None)):
     tables = {
         "info": "participant_details",
         "muni": "municipal_applications",
+        "cultistud": "cultistud_applications",
         "apply": "seminar_applications",
     }
     table = tables.get(form, "seminar_applications")
     if form == "info":
         country_col = "depart_country"
-    elif form == "muni":
+    elif form in ("muni", "cultistud"):
         country_col = "region"
     else:
         country_col = "country"
@@ -837,7 +859,7 @@ def get_application(
 
 
 def _set_deleted(table: str, item_id: int, trash: bool) -> dict:
-    if table not in ("seminar_applications", "participant_details", "municipal_applications"):
+    if table not in ("seminar_applications", "participant_details", "municipal_applications", CULTISTUD_TABLE):
         raise HTTPException(500, "bad table")
     if trash:
         sql = (
@@ -1192,3 +1214,87 @@ def get_municipal_file(
     )
     return send_download(path, name)
 
+
+
+# --- University seminar (Cultistudform) -------------------------------------
+
+
+@router.get('/api/cultistud')
+def list_cultistud(request: Request, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    f = parse_muni_filters(request)
+    where, args = where_muni_sql(f)
+    offset = (f['page'] - 1) * f['limit']
+    sql_count = f'SELECT COUNT(*) FROM {CULTISTUD_TABLE} WHERE {where}'
+    sql = (
+        'SELECT id, created_at, deleted_at, fio, email, phone, federal_district, '
+        'region, city, workplace, position, stream '
+        f'FROM {CULTISTUD_TABLE} WHERE {where} '
+        f"ORDER BY {f['sort']} {f['order']} NULLS LAST "
+        'LIMIT %s OFFSET %s'
+    )
+    with db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql_count, args)
+            total = cur.fetchone()[0]
+            cur.execute(sql, args + [f['limit'], offset])
+            items = as_dicts(cur)
+    return {
+        'items': items,
+        'total': total,
+        'page': f['page'],
+        'limit': f['limit'],
+        'pages': max(1, (total + f['limit'] - 1) // f['limit']),
+        'sort': f['sort'],
+        'order': f['order'].lower(),
+    }
+
+
+@router.get('/api/cultistud/export.xlsx')
+def export_cultistud_xlsx(request: Request, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    f = parse_muni_filters(request)
+    where, args = where_muni_sql(f)
+    sql = (
+        f'SELECT * FROM {CULTISTUD_TABLE} WHERE {where} '
+        f"ORDER BY {f['sort']} {f['order']} NULLS LAST"
+    )
+    with db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql, args)
+            rows = as_dicts(cur)
+    return _xlsx(
+        rows,
+        CULTISTUD_EXCEL_COLUMNS,
+        'University',
+        'mashuk_cultistud.xlsx',
+    )
+
+
+@router.get('/api/cultistud/{item_id}')
+def get_cultistud(
+    item_id: int,
+    mashuk_admin: Optional[str] = Cookie(default=None),
+):
+    require_admin(mashuk_admin)
+    with db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(f'SELECT * FROM {CULTISTUD_TABLE} WHERE id = %s', (item_id,))
+            items = as_dicts(cur)
+    if not items:
+        raise HTTPException(404, 'not found')
+    item = items[0]
+    item.pop('payload_raw', None)
+    return item
+
+
+@router.post('/api/cultistud/{item_id}/trash')
+def trash_cultistud(item_id: int, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    return _set_deleted(CULTISTUD_TABLE, item_id, True)
+
+
+@router.post('/api/cultistud/{item_id}/restore')
+def restore_cultistud(item_id: int, mashuk_admin: Optional[str] = Cookie(default=None)):
+    require_admin(mashuk_admin)
+    return _set_deleted(CULTISTUD_TABLE, item_id, False)

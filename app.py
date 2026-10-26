@@ -731,3 +731,104 @@ def muni_apply(
         raise HTTPException(500, "database error")
 
     return JSONResponse({"ok": True, "id": row[0] if row else None})
+
+
+CULTISTUD_COLS = [
+    "fio",
+    "federal_district",
+    "region",
+    "city",
+    "workplace",
+    "position",
+    "birth_date",
+    "snils",
+    "inn",
+    "phone",
+    "email",
+    "stream",
+    "payload_raw",
+]
+
+# The seminar runs once, so the stream is fixed instead of being asked.
+CULTISTUD_STREAM = "\u0035 \u2014 8 \u043d\u043e\u044f\u0431\u0440\u044f 2026"
+
+CULTISTUD_REQUIRED = (
+    "fio",
+    "federal_district",
+    "region",
+    "city",
+    "workplace",
+    "position",
+    "birth_date",
+    "snils",
+    "inn",
+    "phone",
+    "email",
+)
+
+
+@app.get("/cultistudform")
+@app.get("/cultistudform/")
+def cultistud_form_page():
+    path = ROOT / "static" / "cultistudform.html"
+    if not path.exists():
+        raise HTTPException(404, "university form is missing")
+    return FileResponse(path, media_type="text/html; charset=utf-8")
+
+
+@app.post("/cultistudform")
+def cultistud_apply(payload: str = Form(...)):
+    if not DATABASE_URL:
+        raise HTTPException(500, "DATABASE_URL is not set")
+    try:
+        data = json.loads(payload)
+    except json.JSONDecodeError:
+        raise HTTPException(400, "payload must be JSON")
+    if not isinstance(data, dict):
+        raise HTTPException(400, "payload must be an object")
+    for key in CULTISTUD_REQUIRED:
+        if not str(data.get(key) or "").strip():
+            raise HTTPException(400, key + " required")
+
+    data["federal_district"] = normalize_district(str(data.get("federal_district") or ""))
+    if data["federal_district"] not in DISTRICTS:
+        raise HTTPException(400, "federal_district invalid")
+    region = str(data.get("region") or "").strip()
+    if region not in REGIONS_SET:
+        raise HTTPException(400, "region invalid")
+    data["region"] = region
+    if not valid_snils(str(data.get("snils") or "")):
+        raise HTTPException(400, "snils invalid")
+    if not valid_inn(str(data.get("inn") or "")):
+        raise HTTPException(400, "inn invalid")
+    if not valid_email(str(data.get("email") or "")):
+        raise HTTPException(400, "email invalid")
+    data["stream"] = CULTISTUD_STREAM
+
+    values = []
+    for col in CULTISTUD_COLS:
+        if col == "payload_raw":
+            values.append(Json(data))
+            continue
+        val = data.get(col)
+        values.append(None if val is None else str(val).strip())
+
+    placeholders = ", ".join(["%s"] * len(CULTISTUD_COLS))
+    sql = (
+        "INSERT INTO cultistud_applications ("
+        + ", ".join(CULTISTUD_COLS)
+        + ") VALUES ("
+        + placeholders
+        + ") RETURNING id"
+    )
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, values)
+                row = cur.fetchone()
+            conn.commit()
+    except Exception:
+        log.exception("cultistud insert failed")
+        raise HTTPException(500, "database error")
+
+    return JSONResponse({"ok": True, "id": row[0] if row else None})

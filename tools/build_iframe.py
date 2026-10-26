@@ -164,6 +164,12 @@ def block(kind):
         title = "Mashuk municipal apply"
         old = "mshk-muni-wrap"
         page = "municipal application"
+    elif kind == "cultistud":
+        clip, frame = "mshk-c-clip", "mshk-c-frame"
+        src = "https://zuevpu-mashuk-forms-e759.twc1.net/cultistudform"
+        title = "Mashuk university seminar apply"
+        old = "mshk-cultistud-wrap"
+        page = "university seminar application"
     else:
         clip, frame = "mshk-i-clip", "mshk-i-frame"
         src = "https://zuevpu-mashuk-forms-e759.twc1.net/info"
@@ -216,9 +222,12 @@ def main():
     (TILDA / "tilda-iframe-block.html").write_text(apply_html, encoding="utf-8")
     (TILDA / "tilda-iframe-info.html").write_text(info_html, encoding="utf-8")
     (TILDA / "tilda-iframe-muni.html").write_text(muni_html, encoding="utf-8")
+    cultistud_html = block("cultistud")
+    (TILDA / "tilda-iframe-cultistud.html").write_text(cultistud_html, encoding="utf-8")
     print("wrote", TILDA / "tilda-iframe-block.html", len(apply_html))
     print("wrote", TILDA / "tilda-iframe-info.html", len(info_html))
     print("wrote", TILDA / "tilda-iframe-muni.html", len(muni_html))
+    print("wrote", TILDA / "tilda-iframe-cultistud.html", len(cultistud_html))
 
 
 if __name__ == "__main__":

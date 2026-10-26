@@ -48,13 +48,21 @@ T = {
     "form_apply": "\u041e\u0431\u0440\u0430\u0437\u043e\u0432\u0430\u043d\u0438\u0435 \u043d\u0430 \u0432\u044b\u0441\u043e\u0442\u0435 \u2014 \u0437\u0430\u044f\u0432\u043a\u0430",
     "form_info": "\u041e\u0431\u0440\u0430\u0437\u043e\u0432\u0430\u043d\u0438\u0435 \u043d\u0430 \u0432\u044b\u0441\u043e\u0442\u0435 \u2014 \u0434\u0430\u043d\u043d\u044b\u0435 \u0443\u0447\u0430\u0441\u0442\u043d\u0438\u043a\u043e\u0432",
     "form_muni": "\u041c\u0435\u0436\u043d\u0430\u0446\u0438\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0435 \u043e\u0442\u043d\u043e\u0448\u0435\u043d\u0438\u044f \u0432 \u043c\u0443\u043d\u0438\u0446\u0438\u043f\u0430\u043b\u0438\u0442\u0435\u0442\u0430\u0445 \u2014 \u0437\u0430\u044f\u0432\u043a\u0430",
+    "form_cultistud": "\u0412\u0443\u0437\u044b \u2014 \u0437\u0430\u044f\u0432\u043a\u0430",
+    "form_muni": "\u041c\u0435\u0436\u043d\u0430\u0446\u0438\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0435 \u043e\u0442\u043d\u043e\u0448\u0435\u043d\u0438\u044f \u0432 \u043c\u0443\u043d\u0438\u0446\u0438\u043f\u0430\u043b\u0438\u0442\u0435\u0442\u0430\u0445 \u2014 \u0437\u0430\u044f\u0432\u043a\u0430",
     "trash": "\u041a\u043e\u0440\u0437\u0438\u043d\u0430",
     "title_apply": "\u041e\u0431\u0440\u0430\u0437\u043e\u0432\u0430\u043d\u0438\u0435 \u043d\u0430 \u0432\u044b\u0441\u043e\u0442\u0435 \u2014 \u0437\u0430\u044f\u0432\u043a\u0430",
     "title_info": "\u041e\u0431\u0440\u0430\u0437\u043e\u0432\u0430\u043d\u0438\u0435 \u043d\u0430 \u0432\u044b\u0441\u043e\u0442\u0435 \u2014 \u0434\u0430\u043d\u043d\u044b\u0435 \u0443\u0447\u0430\u0441\u0442\u043d\u0438\u043a\u043e\u0432",
     "title_muni": "\u041c\u0435\u0436\u043d\u0430\u0446\u0438\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0435 \u043e\u0442\u043d\u043e\u0448\u0435\u043d\u0438\u044f \u0432 \u043c\u0443\u043d\u0438\u0446\u0438\u043f\u0430\u043b\u0438\u0442\u0435\u0442\u0430\u0445 \u2014 \u0437\u0430\u044f\u0432\u043a\u0430",
+    "title_cultistud": "\u0412\u0443\u0437\u044b \u2014 \u0437\u0430\u044f\u0432\u043a\u0430",
+    "title_muni": "\u041c\u0435\u0436\u043d\u0430\u0446\u0438\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0435 \u043e\u0442\u043d\u043e\u0448\u0435\u043d\u0438\u044f \u0432 \u043c\u0443\u043d\u0438\u0446\u0438\u043f\u0430\u043b\u0438\u0442\u0435\u0442\u0430\u0445 \u2014 \u0437\u0430\u044f\u0432\u043a\u0430",
     "title_trash_apply": "\u041a\u043e\u0440\u0437\u0438\u043d\u0430 \u2014 \u0437\u0430\u044f\u0432\u043a\u0438 \u00ab\u041e\u0431\u0440\u0430\u0437\u043e\u0432\u0430\u043d\u0438\u0435 \u043d\u0430 \u0432\u044b\u0441\u043e\u0442\u0435\u00bb",
     "title_trash_info": "\u041a\u043e\u0440\u0437\u0438\u043d\u0430 \u2014 \u0434\u0430\u043d\u043d\u044b\u0435 \u0443\u0447\u0430\u0441\u0442\u043d\u0438\u043a\u043e\u0432",
     "title_trash_muni": "\u041a\u043e\u0440\u0437\u0438\u043d\u0430 \u2014 \u0437\u0430\u044f\u0432\u043a\u0438 \u043c\u0443\u043d\u0438\u0446\u0438\u043f\u0430\u043b\u0438\u0442\u0435\u0442\u043e\u0432",
+    "title_trash_cultistud": "\u041a\u043e\u0440\u0437\u0438\u043d\u0430 \u2014 \u0437\u0430\u044f\u0432\u043a\u0438 \u0432\u0443\u0437\u043e\u0432",
+    "title_trash_muni": "\u041a\u043e\u0440\u0437\u0438\u043d\u0430 \u2014 \u0437\u0430\u044f\u0432\u043a\u0438 \u043c\u0443\u043d\u0438\u0446\u0438\u043f\u0430\u043b\u0438\u0442\u0435\u0442\u043e\u0432",
+    "search_muni": "\u041f\u043e\u0438\u0441\u043a: \u0424\u0418\u041e, email, \u0442\u0435\u043b\u0435\u0444\u043e\u043d, \u0440\u0435\u0433\u0438\u043e\u043d, \u043c\u0435\u0441\u0442\u043e \u0440\u0430\u0431\u043e\u0442\u044b",
+    "search_cultistud": "\u041f\u043e\u0438\u0441\u043a: \u0424\u0418\u041e, email, \u0442\u0435\u043b\u0435\u0444\u043e\u043d, \u0440\u0435\u0433\u0438\u043e\u043d, \u043c\u0435\u0441\u0442\u043e \u0440\u0430\u0431\u043e\u0442\u044b",
     "search_muni": "\u041f\u043e\u0438\u0441\u043a: \u0424\u0418\u041e, email, \u0442\u0435\u043b\u0435\u0444\u043e\u043d, \u0440\u0435\u0433\u0438\u043e\u043d, \u043c\u0435\u0441\u0442\u043e \u0440\u0430\u0431\u043e\u0442\u044b",
     "th_region": "\u0420\u0435\u0433\u0438\u043e\u043d",
     "th_work": "\u041c\u0435\u0441\u0442\u043e \u0440\u0430\u0431\u043e\u0442\u044b",
@@ -211,10 +219,29 @@ LABELS_MUNI = {
     "deleted_at": "\u0423\u0434\u0430\u043b\u0435\u043d\u0430",
 }
 
+LABELS_CULTISTUD = {
+    "id": "ID",
+    "created_at": T["th_date"],
+    "fio": "\u0424\u0418\u041e",
+    "federal_district": "\u0424\u0435\u0434\u0435\u0440\u0430\u043b\u044c\u043d\u044b\u0439 \u043e\u043a\u0440\u0443\u0433",
+    "region": "\u0420\u0435\u0433\u0438\u043e\u043d",
+    "city": "\u0413\u043e\u0440\u043e\u0434",
+    "workplace": "\u0423\u0447\u0435\u0431\u043d\u043e\u0435 \u0437\u0430\u0432\u0435\u0434\u0435\u043d\u0438\u0435 / \u043c\u0435\u0441\u0442\u043e \u0440\u0430\u0431\u043e\u0442\u044b",
+    "position": "\u0414\u043e\u043b\u0436\u043d\u043e\u0441\u0442\u044c / \u043a\u0443\u0440\u0441 \u0438 \u043d\u0430\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435",
+    "birth_date": "\u0414\u0430\u0442\u0430 \u0440\u043e\u0436\u0434\u0435\u043d\u0438\u044f",
+    "snils": "\u0421\u041d\u0418\u041b\u0421",
+    "inn": "\u0418\u041d\u041d",
+    "phone": T["th_phone"],
+    "email": "E-mail",
+    "stream": T["stream"],
+    "deleted_at": "\u0423\u0434\u0430\u043b\u0435\u043d\u0430",
+}
+
 JS_I18N = json.dumps(T, ensure_ascii=True)
 JS_LABELS = json.dumps(LABELS, ensure_ascii=True)
 JS_LABELS_INFO = json.dumps(LABELS_INFO, ensure_ascii=True)
 JS_LABELS_MUNI = json.dumps(LABELS_MUNI, ensure_ascii=True)
+JS_LABELS_CULTISTUD = json.dumps(LABELS_CULTISTUD, ensure_ascii=True)
 
 CSS = r"""
 @import url("https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap");
@@ -296,6 +323,7 @@ html = f"""<!DOCTYPE html>
             <option value="apply">{eh(T['form_apply'])}</option>
             <option value="info">{eh(T['form_info'])}</option>
             <option value="muni">{eh(T['form_muni'])}</option>
+            <option value="cultistud">{eh(T['form_cultistud'])}</option>
           </select>
         </div>
         <button class="btn btn-off" id="trash-btn" type="button">{eh(T['trash'])}</button>
@@ -354,7 +382,8 @@ html = f"""<!DOCTYPE html>
   var LABELS = {JS_LABELS};
   var LABELS_INFO = {JS_LABELS_INFO};
   var LABELS_MUNI = {JS_LABELS_MUNI};
-  var FORMS = ["apply","info","muni"];
+  var LABELS_CULTISTUD = {JS_LABELS_CULTISTUD};
+  var FORMS = ["apply","info","muni","cultistud"];
   var state = {{ page:1, sort:"created_at", order:"desc", form:"apply", trash:false }};
   var loadSeq = 0;
   var ignoreFilterChange = false;
@@ -412,20 +441,25 @@ html = f"""<!DOCTYPE html>
   }}
   function isInfo(){{ return state.form === "info"; }}
   function isMuni(){{ return state.form === "muni"; }}
+  function isCultistud(){{ return state.form === "cultistud"; }}
+  function isMuniLike(){{ return isMuni() || isCultistud(); }}
   function isTrash(){{ return !!state.trash; }}
   function pageTitle(){{
     if (isTrash()) {{
       if (isInfo()) return T.title_trash_info;
       if (isMuni()) return T.title_trash_muni;
+      if (isCultistud()) return T.title_trash_cultistud;
       return T.title_trash_apply;
     }}
     if (isInfo()) return T.title_info;
     if (isMuni()) return T.title_muni;
+    if (isCultistud()) return T.title_cultistud;
     return T.title_apply;
   }}
   function listUrl(){{
     if (isInfo()) return "/admin/api/participants";
     if (isMuni()) return "/admin/api/municipal";
+    if (isCultistud()) return "/admin/api/cultistud";
     return "/admin/api/applications";
   }}
   function itemUrl(id){{ return listUrl() + "/" + id; }}
@@ -433,13 +467,13 @@ html = f"""<!DOCTYPE html>
     document.getElementById("form-select").value = state.form;
     document.getElementById("trash-btn").className = "btn " + (isTrash() ? "btn-on" : "btn-off");
     document.getElementById("page-title").textContent = pageTitle();
-    document.getElementById("f-q").placeholder = isMuni() ? T.search_muni : (isInfo() ? T.search_info : T.search);
-    document.getElementById("f-gender-wrap").style.display = (isInfo() || isMuni()) ? "none" : "";
+    document.getElementById("f-q").placeholder = isMuni() ? T.search_muni : (isCultistud() ? T.search_cultistud : (isInfo() ? T.search_info : T.search));
+    document.getElementById("f-gender-wrap").style.display = (isInfo() || isMuniLike()) ? "none" : "";
     var countrySel = document.getElementById("f-country");
     if (countrySel && countrySel.options[0]) {{
-      countrySel.options[0].textContent = (isMuni() ? T.region : T.country) + ": " + T.all;
+      countrySel.options[0].textContent = (isMuniLike() ? T.region : T.country) + ": " + T.all;
     }}
-    document.getElementById("consents-btn").style.display = (isInfo() || isTrash()) ? "none" : "";
+    document.getElementById("consents-btn").style.display = (isInfo() || isTrash() || isCultistud()) ? "none" : "";
     document.getElementById("excel-btn").style.display = isTrash() ? "none" : "";
   }}
   function clearFilters(){{
@@ -475,7 +509,7 @@ html = f"""<!DOCTYPE html>
     var head = document.getElementById("thead");
     var cols;
     if (isInfo()) cols = [["id", T.th_id],["created_at", T.th_date],["fio_latin", T.th_fio],["meal_type", T.th_meal],["depart_country", T.th_country],["depart_city", T.th_city],["visa_needed", T.th_visa],["stream", T.th_stream]];
-    else if (isMuni()) cols = [["id", T.th_id],["created_at", T.th_date],["fio", T.th_fio],["email", T.th_email],["phone", T.th_phone],["region", T.th_region],["workplace", T.th_work],["stream", T.th_stream]];
+    else if (isMuniLike()) cols = [["id", T.th_id],["created_at", T.th_date],["fio", T.th_fio],["email", T.th_email],["phone", T.th_phone],["region", T.th_region],["workplace", T.th_work],["stream", T.th_stream]];
     else cols = [["id", T.th_id],["created_at", T.th_date],["fio_latin", T.th_fio],["email", T.th_email],["phone", T.th_phone],["country", T.th_country],["org_name", T.th_org],["stream", T.th_stream]];
     if (isTrash()) cols.push(["deleted_at", T.th_deleted]);
     var html = "<tr>";
@@ -491,7 +525,7 @@ html = f"""<!DOCTYPE html>
     api("/admin/api/meta?form=" + form).then(function(m){{
       if (seq !== loadSeq || state.form !== form) return;
       fillSelect("f-stream", m.streams, T.stream);
-      fillSelect("f-country", m.countries, form === "muni" ? T.region : T.country);
+      fillSelect("f-country", m.countries, (form === "muni" || form === "cultistud") ? T.region : T.country);
       if (form === "apply") fillSelect("f-gender", m.genders, T.gender);
     }}).catch(function(){{}});
   }}
@@ -552,7 +586,7 @@ html = f"""<!DOCTYPE html>
             "<td>" + esc(it.depart_city||"") + "</td>" +
             "<td>" + esc(it.visa_needed||"") + "</td>" +
             "<td>" + esc(it.stream||"") + "</td>";
-        }} else if (muni) {{
+        }} else if (muni || form === "cultistud") {{
           tr.innerHTML =
             "<td>" + it.id + "</td>" +
             "<td>" + fmtDate(it.created_at) + "</td>" +
@@ -625,7 +659,7 @@ html = f"""<!DOCTYPE html>
     api(itemUrl(id)).then(function(it){{
       if (state.form !== form) return;
       document.getElementById("card-title").textContent = it.fio || it.fio_latin || ("#" + it.id);
-      var labels = form === "info" ? LABELS_INFO : (form === "muni" ? LABELS_MUNI : LABELS);
+      var labels = form === "info" ? LABELS_INFO : (form === "muni" ? LABELS_MUNI : (form === "cultistud" ? LABELS_CULTISTUD : LABELS));
       var skip = {{payload_raw:1, has_portfolio:1, has_consent:1, portfolio_url:1, consent_url:1}};
       if (!isTrash()) skip.deleted_at = 1;
       var html = "";
@@ -639,7 +673,7 @@ html = f"""<!DOCTYPE html>
         else html += 'Не прикреплён';
         html += '</span></div>';
       }}
-      if (form !== "info") {{
+      if (form !== "info" && form !== "cultistud") {{
         html += '<div class="kv"><b>' + T.files + "</b><span>";
         if (form === "apply") {{
           if (it.has_portfolio) html += '<button class="btn btn-navy" type="button" data-dl="/admin/api/applications/' + id + '/file/portfolio" data-name="portfolio.pdf">' + T.dl_portfolio + "</button> ";
@@ -688,7 +722,7 @@ html = f"""<!DOCTYPE html>
   }};
   document.getElementById("excel-btn").onclick = function(){{
     var path = listUrl() + "/export.xlsx?";
-    var name = isMuni() ? "mashuk_municipality.xlsx" : (isInfo() ? "mashuk_uchastniki.xlsx" : "mashuk_zayavki.xlsx");
+    var name = isCultistud() ? "mashuk_cultistud.xlsx" : (isMuni() ? "mashuk_municipality.xlsx" : (isInfo() ? "mashuk_uchastniki.xlsx" : "mashuk_zayavki.xlsx"));
     saveBlob(path + qs(), name);
   }};
   document.getElementById("consents-btn").onclick = function(){{

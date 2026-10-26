@@ -164,3 +164,31 @@ CREATE INDEX IF NOT EXISTS municipal_applications_email_idx
     ON municipal_applications (email);
 CREATE INDEX IF NOT EXISTS municipal_applications_deleted_idx
     ON municipal_applications (deleted_at);
+
+-- University seminar "Студенческие сообщества как пространство
+-- поликультурного взаимодействия" (Cultistudform), 5-8 November 2026.
+CREATE TABLE IF NOT EXISTS cultistud_applications (
+    id               BIGSERIAL PRIMARY KEY,
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at       TIMESTAMPTZ,
+    fio              TEXT NOT NULL,
+    federal_district TEXT,
+    region           TEXT,
+    city             TEXT,
+    workplace        TEXT,
+    position         TEXT,
+    birth_date       TEXT,
+    snils            TEXT,
+    inn              TEXT,
+    phone            TEXT,
+    email            TEXT,
+    stream           TEXT,
+    payload_raw      JSONB
+);
+
+CREATE INDEX IF NOT EXISTS cultistud_applications_created_idx
+    ON cultistud_applications (created_at DESC);
+CREATE INDEX IF NOT EXISTS cultistud_applications_email_idx
+    ON cultistud_applications (email);
+CREATE INDEX IF NOT EXISTS cultistud_applications_deleted_idx
+    ON cultistud_applications (deleted_at);
