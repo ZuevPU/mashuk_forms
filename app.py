@@ -762,6 +762,12 @@ CULTISTUD_PASSWORD = os.environ.get("CULTISTUD_PASSWORD", "2610").strip() or "26
 CULTISTUD_COOKIE = "mshk_cultistud"
 CULTISTUD_TOKEN_TTL = 7 * 24 * 60 * 60
 
+# Registration is over: the form is replaced by a closed page and submissions
+# are refused. Set CULTISTUD_FORM_CLOSED=0 to open the form again.
+CULTISTUD_FORM_CLOSED = os.environ.get(
+    "CULTISTUD_FORM_CLOSED", "1"
+).strip().lower() not in ("0", "false", "no", "off")
+
 
 def _cultistud_secret() -> bytes:
     return (os.environ.get("ADMIN_SECRET", "").strip() or "cultistud").encode("utf-8")
@@ -811,6 +817,15 @@ CULTISTUD_REQUIRED = (
 def cultistud_form_page(request: Request):
     form = ROOT / "static" / "cultistudform.html"
     gate = ROOT / "static" / "cultistudgate.html"
+    if CULTISTUD_FORM_CLOSED:
+        closed = ROOT / "static" / "cultistudclosed.html"
+        if not closed.exists():
+            raise HTTPException(404, "closed page is missing")
+        return FileResponse(
+            closed,
+            media_type="text/html; charset=utf-8",
+            headers={"Cache-Control": "no-store"},
+        )
     if not cultistud_allowed(request, request.query_params.get("t", "")):
         if not gate.exists():
             raise HTTPException(404, "password screen is missing")
@@ -852,6 +867,8 @@ def cultistud_apply(
     payload: str = Form(...),
     t: str = Form(default=""),
 ):
+    if CULTISTUD_FORM_CLOSED:
+        raise HTTPException(403, "registration is closed")
     if not cultistud_allowed(request, t):
         raise HTTPException(403, "password required")
     if not DATABASE_URL:

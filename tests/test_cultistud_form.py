@@ -21,6 +21,11 @@ class CultistudFormTests(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(app.app)
         self.addCleanup(self.client.close)
+        # Registration is closed in production by default; the form and the
+        # password gate are exercised with the switch turned off.
+        opened = patch.object(app, "CULTISTUD_FORM_CLOSED", False)
+        opened.start()
+        self.addCleanup(opened.stop)
         self.payload = {
             "fio": "Тест Тестов",
             "federal_district": app.DISTRICTS[0],
@@ -45,6 +50,42 @@ class CultistudFormTests(unittest.TestCase):
         response = self.unlock()
         self.assertEqual(response.status_code, 200, response.text)
         return response.json()["token"]
+
+    # --- registration closed ------------------------------------------------
+
+    def test_closed_page_replaces_the_form(self):
+        import html as H
+
+        with patch.object(app, "CULTISTUD_FORM_CLOSED", True):
+            r = self.client.get("/cultistudform")
+        self.assertEqual(r.status_code, 200)
+        text = H.unescape(r.text)
+        self.assertIn("Регистрация завершена", text)
+        self.assertNotIn("Доступ по паролю", text)
+        self.assertNotIn('data-field="fio"', r.text)
+        self.assertEqual(r.headers["cache-control"], "no-store")
+
+    def test_closed_page_wins_over_the_token(self):
+        import html as H
+
+        token = self.token()
+        with patch.object(app, "CULTISTUD_FORM_CLOSED", True):
+            r = self.client.get("/cultistudform", params={"t": token})
+        self.assertIn("Регистрация завершена", H.unescape(r.text))
+        self.assertNotIn('data-field="fio"', r.text)
+
+    def test_submission_refused_when_closed(self):
+        token = self.token()
+        with patch.object(app, "CULTISTUD_FORM_CLOSED", True), \
+             patch.object(app, "DATABASE_URL", "test-only"), \
+             patch.object(app.psycopg, "connect") as connect:
+            r = self.client.post(
+                "/cultistudform",
+                data={"payload": json.dumps(self.payload, ensure_ascii=False), "t": token},
+            )
+        self.assertEqual(r.status_code, 403, r.text)
+        self.assertEqual(r.json()["detail"], "registration is closed")
+        connect.assert_not_called()
 
     # --- password gate -----------------------------------------------------
 
